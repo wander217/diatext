@@ -50,7 +50,7 @@ train:
     prep:
       DetMask:
         ignore_thresh: 100
-        erode: 40
+        erode: 20
         dilate: 10
       DetAug:
         onlyResize: False

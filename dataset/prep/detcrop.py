@@ -17,8 +17,11 @@ class DetCrop:
         return output
 
     def _visual(self, data: Dict):
-        img = data['img']
-        cv.imshow('aug_visual', img)
+        cv.imshow('image', data['img'])
+        cv.imshow('prob_map', data['probMap'])
+        cv.imshow('prob_mask', data['probMask'])
+        cv.imshow('thresh_map', data['threshMap'])
+        cv.imshow('thresh_mask', data['threshMask'])
 
     def _build(self, data: Dict) -> Dict:
         img: np.ndarray = data['img']

@@ -23,10 +23,7 @@ class DetMask:
         return output
 
     def _visual(self, data: Dict):
-        cv.imshow('prob_map', data['probMap'])
-        cv.imshow('prob_mask', data['probMask'])
-        cv.imshow('thresh_map', data['threshMap'])
-        cv.imshow('thresh_mask', data['threshMask'])
+        pass
 
     def _build(self, data: Dict) -> Dict:
         img = data['img']
@@ -48,8 +45,8 @@ class DetMask:
                 continue
             cv.fillPoly(prob, [tmp.astype(np.int32)], 1)
             cv.fillPoly(thresh_mask, [tmp.astype(np.int32)], 1)
-        prob_map = cv.dilate(prob, (self._erode, self._erode))
-        thresh_map = prob_map - cv.erode(prob, (self._dilate, self._dilate))
+        prob_map = cv.dilate(prob, np.ones((self._dilate, self._dilate)))
+        thresh_map = prob_map - cv.erode(prob, np.ones((self._erode, self._erode)))
         new_data = OrderedDict(img=img,
                                polygon=boxes,
                                ignore=ignore,

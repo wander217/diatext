@@ -19,7 +19,7 @@ class DetMask:
         """
         output = self._build(data)
         if isVisual:
-            self._visual(data)
+            self._visual(output)
         return output
 
     def _visual(self, data: Dict):
@@ -45,10 +45,9 @@ class DetMask:
                     or polygon.area < self._ignore_thresh:
                 ignore[i] = True
                 cv.fillPoly(prob_mask, [tmp.astype(np.int32)], 0)
-                cv.fillPoly(thresh_mask, [tmp.astype(np.int32)], 1)
                 continue
             cv.fillPoly(prob, [tmp.astype(np.int32)], 1)
-        print(ignore.shape)
+            cv.fillPoly(thresh_mask, [tmp.astype(np.int32)], 1)
         prob_map = cv.dilate(prob, (self._erode, self._erode))
         thresh_map = prob_map - cv.erode(prob, (self._dilate, self._dilate))
         new_data = OrderedDict(img=img,

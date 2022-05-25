@@ -50,8 +50,8 @@ train:
     prep:
       DetMask:
         ignore_thresh: 100
-        erode: 11
-        dilate: 11
+        erode: 40
+        dilate: 10
       DetAug:
         onlyResize: False
         Fliplr:

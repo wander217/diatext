@@ -18,13 +18,6 @@ class DetCrop:
 
     def _visual(self, data: Dict):
         img = data['img']
-        tars = data['target']
-        for tar in tars:
-            cv.polylines(img,
-                         [np.int32(tar['polygon']).reshape((-1, 1, 2))],
-                         True,
-                         (255, 255, 0),
-                         2)
         cv.imshow('aug_visual', img)
 
     def _build(self, data: Dict) -> Dict:

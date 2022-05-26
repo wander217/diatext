@@ -21,8 +21,15 @@ lossModel:
       exp: 256
 
   loss:
-    binaryLoss:
+    threshScale: 10
+    threshLoss:
+      eps: !!float '1e-6'
+    probScale: 5
+    probLoss:
       ratio: 3.
+      eps: !!float '1e-6'
+    binaryScale: 1
+    binaryLoss:
       eps: !!float '1e-6'
 
 score:
@@ -67,7 +74,7 @@ train:
       DetCrop:
         minCropSize: 0.1
         maxTries: 10
-        generalSize: [ 640, 640 ]
+        generalSize: [ 960, 960 ]
       DetNorm:
         mean: [ 122.67891434, 116.66876762, 104.00698793 ]
       DetFilter:

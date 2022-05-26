@@ -31,16 +31,12 @@ class DetAug:
             self._visual(data)
         return output
 
-    def _visual(self, data: Dict, lineHeight: int = 2):
-        img = data['img']
-        tars = data['polygon']
-        for tar in tars:
-            cv.polylines(img,
-                         [np.int32(tar).reshape((1, -1, 2))],
-                         True,
-                         (255, 255, 0),
-                         lineHeight)
-        cv.imshow('aug_visual', img)
+    def _visual(self, data: Dict):
+        cv.imshow('image', data['img'])
+        cv.imshow('prob_map', np.uint8(data['probMap'] * 255))
+        cv.imshow('prob_mask', np.uint8(data['probMask'] * 255))
+        cv.imshow('thresh_map', np.uint8(data['threshMap'] * 255))
+        cv.imshow('thresh_mask', np.uint8(data['threshMask'] * 255))
 
     def _build(self, data: Dict) -> Dict:
         image: np.ndarray = data['img']

@@ -37,7 +37,7 @@ class DetMask:
         for i, target in enumerate(data['target']):
             tmp = np.array(target['bbox'])
             polygon = Polygon(tmp)
-            dist = polygon.area * (1 - np.power(0.4, 2)) / polygon.length
+            dist = polygon.area * (1 - np.power(0.7, 2)) / polygon.length
             subject = [tuple(point) for point in tmp]
             shrinking = pyclipper.PyclipperOffset()
             shrinking.AddPath(subject, pyclipper.JT_ROUND, pyclipper.ET_CLOSEDPOLYGON)

@@ -81,21 +81,21 @@ valid:
   pinMemory: False
   dataset:
     imgType: 0
-    imgDir: 'D:\python_project\dbpp\google_textvalid/image'
+    imgDir: 'D:\python_project\dbpp\google_text\valid/image'
     tarFile: 'D:\python_project\dbpp\google_text\valid/target.json'
     prep:
       DetMask:
         ignore_thresh: 100
-        erode: 11
-        dilate: 11
-        DetAug:
-          onlyResize: True
-          Fliplr:
-            p: 0.5
-        DetNorm:
-          mean: [ 122.67891434, 116.66876762, 104.00698793 ]
-        DetFilter:
-          key: [ 'train' ]
+        erode: 3
+        dilate: 3
+      DetAug:
+        onlyResize: True
+        Fliplr:
+          p: 0.5
+      DetNorm:
+        mean: [ 122.67891434, 116.66876762, 104.00698793 ]
+      DetFilter:
+        key: [ 'train' ]
 
 optimizer:
   name: Adam

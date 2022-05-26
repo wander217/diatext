@@ -18,7 +18,7 @@ class DetCrop:
 
     def _visual(self, data: Dict):
         cv.imshow('image', data['img'])
-        cv.imshow('prob_map', np.uint8(data['probMap'] * 255))
+        cv.imshow('prob_map', np.uint8(data['probMap'][0] * 255))
         cv.imshow('prob_mask', np.uint8(data['probMask'] * 255))
         cv.imshow('thresh_map', np.uint8(data['threshMap'] * 255))
         cv.imshow('thresh_mask', np.uint8(data['threshMask'] * 255))
@@ -37,7 +37,6 @@ class DetCrop:
         pad_image[:h, :w] = cv.resize(img[cropY:cropY + cropH, cropX:cropX + cropW], (w, h))
         pad_prob_map: np.ndarray = np.zeros((self._generalSize[1], self._generalSize[0]), img.dtype)
         pad_prob_map[:h, :w] = cv.resize(data['probMap'][cropY:cropY + cropH, cropX:cropX + cropW], (w, h))
-        pad_prob_map = pad_prob_map[np.newaxis, :, :]
         pad_prob_mask: np.ndarray = np.zeros((self._generalSize[1], self._generalSize[0]), img.dtype)
         pad_prob_mask[:h, :w] = cv.resize(data['probMask'][cropY:cropY + cropH, cropX:cropX + cropW], (w, h))
         pad_thresh_map: np.ndarray = np.zeros((self._generalSize[1], self._generalSize[0]), img.dtype)
@@ -57,7 +56,7 @@ class DetCrop:
         data['polygon'] = new_polygons
         data['ignore'] = np.array(ignores)
         data['img'] = pad_image
-        data['probMap'] = pad_prob_map
+        data['probMap'] = pad_prob_map[None, :, :]
         data['probMask'] = 1 - pad_prob_mask
         data['threshMap'] = pad_thresh_map
         data['threshMask'] = pad_thresh_mask

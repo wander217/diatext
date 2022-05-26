@@ -57,8 +57,8 @@ class DBPredictor:
             h, w, _ = image.shape
             reImage, newH, newW = self._resize(image)
             inputImage = self._normalize(reImage)
-            pred: OrderedDict = self._model(dict(img=inputImage, shape=[newH, newW]), training=False)
-            bs, ss = self._score(pred, dict(img=inputImage))
+            pred: OrderedDict = self._model(dict(img=inputImage, orgShape=[newH, newW]), training=False)
+            bs, ss = self._score(pred, dict(img=inputImage, orgShape=[960, 960]))
             for i in range(len(bs[0])):
                 if ss[0][i] > 0:
                     bboxes.append(bs[0][i])
@@ -67,12 +67,12 @@ class DBPredictor:
 
 
 if __name__ == "__main__":
-    configPath: str = r'D:\adb\config\adb_eb0.yaml'
-    pretrainedPath: str = r'pretrained/checkpoint_1.pth'
+    configPath: str = r'D:\python_project\diatext\config\adb_eb0.yaml'
+    pretrainedPath: str = r'D:\python_project\diatext\checkpoint_1200.pth'
     # configPath: str = r'config/dbpp_eb0.yaml'
     # pretrainedPath: str = r'pretrained/eb0/checkpoint_941.pth'
     # imgPath: str = r'C:\Users\thinhtq\Downloads\vietnamese_original\vietnamese\unseen_test_images\im1999.jpg'
-    imgPath: str = r'D:\adb\test\data\im1328.jpg'
+    imgPath: str = r'D:\python_project\dbpp\google_text\valid\image\00b1edd2d4f04296.jpg'
     predictor = DBPredictor(configPath, pretrainedPath)
     img = cv.imread(imgPath)
     start = time.time()

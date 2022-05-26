@@ -99,7 +99,7 @@ valid:
       DetAug:
         onlyResize: True
         Resize:
-          size: { "height": 960, "width": 960 }
+          size: { "height": 800, "width": 800 }
       DetForm:
         shrinkRatio: 0.4
       ProbMaker:

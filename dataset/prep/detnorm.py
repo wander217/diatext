@@ -15,18 +15,10 @@ class DetNorm:
     def _visual(self, data: OrderedDict):
         print(data.keys())
         print(data['img'].shape)
-        # threshMap = np.uint8(data['threshMap'] * 255)
-        # threshMask = np.uint8(data['threshMask'] * 255)
-        # cv2.imshow("new thresh mask", threshMask)
-        # cv2.imshow("new thresh map", threshMap)
-        # probMap = np.uint8(data['probMap'][0] * 255)
-        # probMask = np.uint8(data['probMask'] * 255)
-        # cv2.imshow("new prob Map", probMap)
-        # cv2.imshow("new prob Mask", probMask)
 
     def _build(self, data: OrderedDict) -> OrderedDict:
         assert 'img' in data
-        image: np.ndarray = data['img']
-        image = (image.astype(np.float64) - self.mean) / 255.
+        image: np.ndarray = data['img'].astype(np.float64)
+        image = (image - self.mean) / 255.
         data['img'] = np.transpose(image, (2, 0, 1))
         return data

@@ -55,10 +55,6 @@ train:
     imgDir: 'D:\python_project\dbpp\google_text\train/image'
     tarFile: 'D:\python_project\dbpp\google_text\train/target.json'
     prep:
-      DetMask:
-        ignore_thresh: 100
-        erode: 3
-        dilate: 3
       DetAug:
         onlyResize: False
         Fliplr:
@@ -66,39 +62,53 @@ train:
         Affine:
           rotate: [ -20, 20 ]
           shear:
-              x : [ -5, 5 ]
-              y : [ -5, 5 ]
+            x: [ -10, 10 ]
+            y: [ -10, 10 ]
           fit_output: True
         Resize:
-          size: [ 1., 3. ]
+          size: [ 0.5, 3. ]
       DetCrop:
         minCropSize: 0.1
         maxTries: 10
-        generalSize: [ 960, 960 ]
+        generalSize: [ 800, 800 ]
+      DetForm:
+        shrinkRatio: 0.4
+      ProbMaker:
+        shrinkRatio: 0.4
+        minTextSize: 8
+      ThreshMaker:
+        expandRatio: 0.4
+        minThresh: 0.3
+        maxThresh: 0.7
       DetNorm:
         mean: [ 122.67891434, 116.66876762, 104.00698793 ]
       DetFilter:
-        key: [ 'polygon', 'ignore', 'train' ]
+        key: [ 'polygon', 'shape', 'ignore', 'train' ]
 
 valid:
   batchSize: 1
   numWorkers: 4
-  dropLast: True
-  shuffle: True
+  dropLast: False
+  shuffle: False
   pinMemory: False
   dataset:
     imgType: 0
-    imgDir: 'D:\python_project\dbpp\google_text\valid/image'
-    tarFile: 'D:\python_project\dbpp\google_text\valid/target.json'
+    imgDir: 'D:\python_project\dbpp\breg_detection\valid\image'
+    tarFile: 'D:\python_project\dbpp\breg_detection\valid\target.json'
     prep:
-      DetMask:
-        ignore_thresh: 100
-        erode: 3
-        dilate: 3
       DetAug:
         onlyResize: True
-        Fliplr:
-          p: 0.5
+        Resize:
+          size: { "height": 960, "width": 960 }
+      DetForm:
+        shrinkRatio: 0.4
+      ProbMaker:
+        shrinkRatio: 0.4
+        minTextSize: 8
+      ThreshMaker:
+        expandRatio: 0.4
+        minThresh: 0.3
+        maxThresh: 0.7
       DetNorm:
         mean: [ 122.67891434, 116.66876762, 104.00698793 ]
       DetFilter:

@@ -62,11 +62,12 @@ class DetDataset(Dataset):
                 cv.waitKey(0)
             return data
         except Exception as e:
+            print(e)
             return self.__getitem__(random.randint(0, self.__len__() - 1), isVisual)
 
     def __len__(self):
-        # return len(self._imgPath)
-        return 1
+        return len(self._imgPath)
+
 
 class DetCollate:
     def __init__(self):
@@ -84,19 +85,19 @@ class DetCollate:
         output: OrderedDict = OrderedDict()
         for element in batch:
             imgs.append(element['img'])
-            probMaps.append(element['probMap'][None, :, :])
+            probMaps.append(element['probMap'])
             probMasks.append(element['probMask'])
             threshMaps.append(element['threshMap'])
             threshMasks.append(element['threshMask'])
             if "polygon" in element:
-                for i in range(len(element['polygon'])):
-                    tmp = element['polygon'][i]
-                    x_min, x_max = np.min(tmp[:, 0]), np.max(tmp[:, 0])
-                    y_min, y_max = np.min(tmp[:, 1]), np.max(tmp[:, 1])
-                    element['polygon'][i] = np.array([
-                        [x_min, y_min], [x_max, y_min],
-                        [x_max, y_max], [x_min, y_max]
-                    ])
+                # for i in range(len(element['polygon'])):
+                #     tmp = element['polygon'][i]
+                #     x_min, x_max = np.min(tmp[:, 0]), np.max(tmp[:, 0])
+                #     y_min, y_max = np.min(tmp[:, 1]), np.max(tmp[:, 1])
+                #     element['polygon'][i] = np.array([
+                #         [x_min, y_min], [x_max, y_min],
+                #         [x_max, y_max], [x_min, y_max]
+                #     ])
                 polygons.append(element['polygon'])
             if "orgShape" in element:
                 orgShapes.append(element['orgShape'])
@@ -108,7 +109,6 @@ class DetCollate:
             probMask=torch.from_numpy(np.asarray(probMasks, dtype=np.int16)),
             threshMap=torch.from_numpy(np.asarray(threshMaps, dtype=np.float64)).float(),
             threshMask=torch.from_numpy(np.asarray(threshMasks, dtype=np.int16)),
-            orgShape=[960, 960]
         )
         if len(polygons) != 0:
             output.update(polygon=torch.from_numpy(np.asarray(polygons, dtype=np.int32)))

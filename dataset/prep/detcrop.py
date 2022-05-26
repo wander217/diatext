@@ -1,14 +1,15 @@
-import math
+import random
+
 import numpy as np
 import cv2 as cv
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 
 class DetCrop:
     def __init__(self, generalSize: List, maxTries: int, minCropSize: float):
+        self._generalSize: List = generalSize
         self._maxTries: int = maxTries
         self._minCropSize: float = minCropSize
-        self._generalSize: List = generalSize
 
     def __call__(self, data: Dict, isVisual: bool = False) -> Dict:
         output: Dict = self._build(data)
@@ -17,49 +18,44 @@ class DetCrop:
         return output
 
     def _visual(self, data: Dict):
-        cv.imshow('image', data['img'])
-        cv.imshow('prob_map', np.uint8(data['probMap'][0] * 255))
-        cv.imshow('prob_mask', np.uint8(data['probMask'] * 255))
-        cv.imshow('thresh_map', np.uint8(data['threshMap'] * 255))
-        cv.imshow('thresh_mask', np.uint8(data['threshMask'] * 255))
+        img = data['img']
+        tars = data['target']
+        for tar in tars:
+            cv.polylines(img,
+                         [np.int32(tar['polygon']).reshape((-1, 1, 2))],
+                         True,
+                         (255, 255, 0),
+                         2)
+        cv.imshow('aug_visual', img)
 
     def _build(self, data: Dict) -> Dict:
         img: np.ndarray = data['img']
-        polygons: List = [polygon for polygon, ignore in zip(data['polygon'], data['ignore']) if not ignore]
-        cropX, cropY, cropW, cropH = self._cropArea(img, polygons)
+        orgAnno: List = data['target']
+        polygon_list: List = [tar['polygon'] for tar in orgAnno if not tar['ignore']]
+        if random.randint(0, 1) == 0:
+            cropX, cropY, cropW, cropH = self._cropArea(img, polygon_list)
+        else:
+            cropX, cropY, cropW, cropH = 0, 0, img.shape[1], img.shape[0]
+
         scaleW: float = self._generalSize[0] / cropW
         scaleH: float = self._generalSize[1] / cropH
         scale: float = min(scaleH, scaleW)
         h = int(scale * cropH)
         w = int(scale * cropW)
 
-        pad_image: np.ndarray = np.zeros((self._generalSize[1], self._generalSize[0], img.shape[2]), img.dtype)
-        pad_image[:h, :w] = cv.resize(img[cropY:cropY + cropH, cropX:cropX + cropW], (w, h))
-        pad_prob_map: np.ndarray = np.zeros((self._generalSize[1], self._generalSize[0]), img.dtype)
-        pad_prob_map[:h, :w] = cv.resize(data['probMap'][cropY:cropY + cropH, cropX:cropX + cropW], (w, h))
-        pad_prob_mask: np.ndarray = np.zeros((self._generalSize[1], self._generalSize[0]), img.dtype)
-        pad_prob_mask[:h, :w] = cv.resize(data['probMask'][cropY:cropY + cropH, cropX:cropX + cropW], (w, h))
-        pad_thresh_map: np.ndarray = np.zeros((self._generalSize[1], self._generalSize[0]), img.dtype)
-        pad_thresh_map[:h, :w] = cv.resize(data['threshMap'][cropY:cropY + cropH, cropX:cropX + cropW], (w, h))
-        pad_thresh_mask: np.ndarray = np.zeros((self._generalSize[1], self._generalSize[0]), img.dtype)
-        pad_thresh_mask[:h, :w] = cv.resize(data['threshMask'][cropY:cropY + cropH, cropX:cropX + cropW], (w, h))
+        padImage: np.ndarray = np.zeros((self._generalSize[1], self._generalSize[0], img.shape[2]), img.dtype)
+        padImage[:h, :w] = cv.resize(img[cropY:cropY + cropH, cropX:cropX + cropW],
+                                     (w, h),
+                                     interpolation=cv.INTER_CUBIC)
 
-        new_polygons: List = []
-        ignores: List = []
-        for i, target in enumerate(data['polygon']):
-            polygon = np.array(target)
-            if not self._isOutside(polygon, [cropX, cropY, cropX + cropW, cropY + cropH]) \
-                    and not data['ignore'][i]:
-                new_polygon: List = ((polygon - (cropX, cropY)) * scale).tolist()
-                new_polygons.append(new_polygon)
-                ignores.append(False)
-        data['polygon'] = new_polygons
-        data['ignore'] = np.array(ignores)
-        data['img'] = pad_image
-        data['probMap'] = pad_prob_map
-        data['probMask'] = 1 - pad_prob_mask
-        data['threshMap'] = pad_thresh_map
-        data['threshMask'] = pad_thresh_mask
+        tars: List = []
+        for target in orgAnno:
+            polygon = np.array(target['polygon'])
+            if not self._isOutside(polygon, [cropX, cropY, cropX + cropW, cropY + cropH]):
+                newPolygon: List = ((polygon - (cropX, cropY)) * scale).tolist()
+                tars.append({**target, 'polygon': newPolygon})
+        data['target'] = tars
+        data['img'] = padImage
         return data
 
     def _cropArea(self, img: np.ndarray, polygons: List) -> tuple:
@@ -96,20 +92,14 @@ class DetCrop:
         return 0, 0, w, h
 
     def _choice(self, segment: List, axis: np.ndarray, limit: int):
-        if len(segment) > 1:
-            id_list: List = list(np.random.choice(len(segment), size=2))
-            value_list: List = []
-            for id in id_list:
-                region: int = segment[id]
-                x: int = int(np.random.choice(region, 1))
-                value_list.append(x)
-            x_min = np.clip(min(value_list), 0, limit - 1)
-            x_max = np.clip(max(value_list), 0, limit - 1)
-        else:
-            x_list: np.ndarray = np.random.choice(axis, size=2)
-            x_min = np.clip(np.min(x_list), 0, limit - 1)
-            x_max = np.clip(np.max(x_list), 0, limit - 1)
-        return x_min, x_max
+        if len(segment) >= 2:
+            tmp: np.ndarray = np.random.choice(len(segment), 2)
+            tmp1 = np.random.choice(segment[tmp[0]], 1)[0]
+            tmp2 = np.random.choice(segment[tmp[1]], 1)[0]
+            return min([tmp1, tmp2]), max([tmp1, tmp2])
+        tmp: np.ndarray = np.random.choice(axis, 2)
+        tmp = np.clip(tmp, 0, limit - 1)
+        return min(tmp), max(tmp)
 
     def _maskDown(self, axis: np.ndarray, polygon: np.ndarray, type: int) -> np.ndarray:
         '''
@@ -153,3 +143,22 @@ class DetCrop:
         if x_min >= lim[0] and x_max <= lim[2] and y_min >= lim[1] and y_max <= lim[3]:
             return False
         return True
+
+    def __crop(self, regions: List, axisNotMask: np.ndarray, size: int) -> Tuple:
+        '''
+            Cắt ngẫu nhiên một đoạn từ trục
+        '''
+        if len(regions) > 1:
+            id_list: List = list(np.random.choice(len(regions), size=2))
+            value_list: List = []
+            for id in id_list:
+                region: int = regions[id]
+                x: int = int(np.random.choice(region, 1))
+                value_list.append(x)
+            x_min = np.clip(min(value_list), 0, size - 1)
+            x_max = np.clip(max(value_list), 0, size - 1)
+        else:
+            x_list: np.ndarray = np.random.choice(axisNotMask, size=2)
+            x_min = np.clip(np.min(x_list), 0, size - 1)
+            x_max = np.clip(np.max(x_list), 0, size - 1)
+        return x_min, x_max

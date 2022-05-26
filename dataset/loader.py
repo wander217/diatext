@@ -62,12 +62,11 @@ class DetDataset(Dataset):
                 cv.waitKey(0)
             return data
         except Exception as e:
-            print(e)
             return self.__getitem__(random.randint(0, self.__len__() - 1), isVisual)
 
     def __len__(self):
-        return len(self._imgPath)
-
+        # return len(self._imgPath)
+        return 1
 
 class DetCollate:
     def __init__(self):

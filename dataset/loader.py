@@ -85,7 +85,7 @@ class DetCollate:
         output: OrderedDict = OrderedDict()
         for element in batch:
             imgs.append(element['img'])
-            probMaps.append(element['probMap'])
+            probMaps.append(element['probMap'][None, :, :])
             probMasks.append(element['probMask'])
             threshMaps.append(element['threshMap'])
             threshMasks.append(element['threshMask'])

@@ -15,9 +15,8 @@ if __name__ == "__main__":
 
     for i in range(0, valid.__len__()):
         data: OrderedDict = valid.__getitem__(i, isVisual=True)
-        print(i)
+        print(data['probMap'].shape)
     #
-
     # train = DetLoader(**config['train']).build()
     # for i, data in enumerate(train):
     #     # print(data.keys())

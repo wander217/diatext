@@ -56,7 +56,7 @@ class DetCrop:
         data['polygon'] = new_polygons
         data['ignore'] = np.array(ignores)
         data['img'] = pad_image
-        data['probMap'] = pad_prob_map[None, :, :]
+        data['probMap'] = pad_prob_map
         data['probMask'] = 1 - pad_prob_mask
         data['threshMap'] = pad_thresh_map
         data['threshMask'] = pad_thresh_mask

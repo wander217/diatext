@@ -109,7 +109,7 @@ class DetCollate:
             probMask=torch.from_numpy(np.asarray(probMasks, dtype=np.int16)),
             threshMap=torch.from_numpy(np.asarray(threshMaps, dtype=np.float64)).float(),
             threshMask=torch.from_numpy(np.asarray(threshMasks, dtype=np.int16)),
-            orgShape=[800, 800]
+            orgShape=[960, 960]
         )
         if len(polygons) != 0:
             output.update(polygon=torch.from_numpy(np.asarray(polygons, dtype=np.int32)))

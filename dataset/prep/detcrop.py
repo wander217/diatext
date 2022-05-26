@@ -37,6 +37,7 @@ class DetCrop:
         pad_image[:h, :w] = cv.resize(img[cropY:cropY + cropH, cropX:cropX + cropW], (w, h))
         pad_prob_map: np.ndarray = np.zeros((self._generalSize[1], self._generalSize[0]), img.dtype)
         pad_prob_map[:h, :w] = cv.resize(data['probMap'][cropY:cropY + cropH, cropX:cropX + cropW], (w, h))
+        pad_prob_map = pad_prob_map[np.newaxis, :, :]
         pad_prob_mask: np.ndarray = np.zeros((self._generalSize[1], self._generalSize[0]), img.dtype)
         pad_prob_mask[:h, :w] = cv.resize(data['probMask'][cropY:cropY + cropH, cropX:cropX + cropW], (w, h))
         pad_thresh_map: np.ndarray = np.zeros((self._generalSize[1], self._generalSize[0]), img.dtype)

@@ -45,9 +45,8 @@ class DetAug:
         if self._prep is not None:
             aug = self._prep.to_deterministic()
             data['img'] = self._resize(data['img']) if self._onlyResize else aug.augment_image(data['img'])
-            data['probMap'] = self._resize(data['probMap'][0]) if self._onlyResize else aug.augment_image(
+            data['probMap'] = self._resize(data['probMap']) if self._onlyResize else aug.augment_image(
                 data['probMap'])
-            data['probMap'] = data['probMap'][np.newaxis, :, :]
             data['probMask'] = self._resize(data['probMask']) if self._onlyResize else aug.augment_image(
                 data['probMask'])
             data['threshMap'] = self._resize(data['threshMap']) if self._onlyResize else aug.augment_image(

@@ -28,8 +28,8 @@ class DetMask:
 
     def _build(self, data: Dict) -> Dict:
         img = data['img']
-        prob = np.zeros((1, *img.shape[:2]))
-        prob_map = np.zeros((1, *img.shape[:2]))
+        prob = np.zeros(img.shape[:2])
+        prob_map = np.zeros(img.shape[:2])
         prob_mask = np.zeros(img.shape[:2])
         thresh_mask = np.zeros(img.shape[:2])
         ignore = np.zeros((len(data['target']),)).astype(np.bool)
@@ -55,10 +55,10 @@ class DetMask:
                 ignore[i] = True
                 cv.fillPoly(prob_mask, [tmp.astype(np.int32)], 1)
                 continue
-            cv.fillPoly(prob[0], [np.array(shrinkPolygon[0]).astype(np.int32)], 1)
-            cv.fillPoly(prob_map[0], [np.array(tmp).astype(np.int32)], 1)
+            cv.fillPoly(prob, [np.array(shrinkPolygon[0]).astype(np.int32)], 1)
+            cv.fillPoly(prob_map, [np.array(tmp).astype(np.int32)], 1)
             cv.fillPoly(thresh_mask, [tmp.astype(np.int32)], 1)
-        thresh_map = cv.dilate(prob_map[0] - prob[0], np.ones((self._erode, self._erode)))
+        thresh_map = cv.dilate(prob_map - prob, np.ones((self._erode, self._erode)))
         new_data = OrderedDict(img=img,
                                polygon=boxes,
                                ignore=ignore,

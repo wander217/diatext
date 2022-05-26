@@ -52,7 +52,7 @@ class DBModel(nn.Module):
 
 # test
 if __name__ == "__main__":
-    file_config: str = r'D:\workspace\project\diatext\config\adb_eb0.yaml'
+    file_config: str = r'D:\python_project\diatext\config\adb_eb0.yaml'
     with open(file_config) as stream:
         data = yaml.safe_load(stream)
     model = DBModel(**data['lossModel']['model'])
@@ -60,7 +60,7 @@ if __name__ == "__main__":
     train_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print('total params:', total_params)
     print('train params:', train_params)
-    image = cv2.imread(r"D:\TextOCR\train_val_images\train_images\0000e8b36676338b.jpg")
+    image = np.ones((1024, 1024, 3))
     h, w, c = image.shape
     new_image = np.zeros((1024, 1024, 3))
     new_image[:h, :w] = image

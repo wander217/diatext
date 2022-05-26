@@ -14,7 +14,7 @@ lossModel:
       useSE: True
     neck:
       data_point: [ 24, 40, 112, 1280 ]
-      layer_num: 2
+      layer_num: 1
       exp: 256
     head:
       thresh: 0.3

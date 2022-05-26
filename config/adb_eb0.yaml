@@ -45,13 +45,13 @@ train:
   pinMemory: False
   dataset:
     imgType: 0
-    imgDir: 'D:\workspace\project\hiertext\data1\train/image'
-    tarFile: 'D:\workspace\project\hiertext\data1\train/target.json'
+    imgDir: 'D:\python_project\dbpp\google_text\train/image'
+    tarFile: 'D:\python_project\dbpp\google_text\train/target.json'
     prep:
       DetMask:
         ignore_thresh: 100
-        erode: 20
-        dilate: 10
+        erode: 3
+        dilate: 3
       DetAug:
         onlyResize: False
         Fliplr:
@@ -59,15 +59,15 @@ train:
         Affine:
           rotate: [ -20, 20 ]
           shear:
-              x : [ -10, 10 ]
-              y : [ -10, 10 ]
+              x : [ -5, 5 ]
+              y : [ -5, 5 ]
           fit_output: True
         Resize:
-          size: [ 0.5, 3. ]
+          size: [ 1., 3. ]
       DetCrop:
         minCropSize: 0.1
         maxTries: 10
-        generalSize: [ 960, 960 ]
+        generalSize: [ 640, 640 ]
       DetNorm:
         mean: [ 122.67891434, 116.66876762, 104.00698793 ]
       DetFilter:
@@ -81,8 +81,8 @@ valid:
   pinMemory: False
   dataset:
     imgType: 0
-    imgDir: 'D:\TextOCR\splited\valid/image'
-    tarFile: 'D:\TextOCR\splited\valid/target.json'
+    imgDir: 'D:\python_project\dbpp\google_textvalid/image'
+    tarFile: 'D:\python_project\dbpp\google_text\valid/target.json'
     prep:
       DetMask:
         ignore_thresh: 100

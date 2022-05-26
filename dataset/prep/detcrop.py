@@ -18,10 +18,10 @@ class DetCrop:
 
     def _visual(self, data: Dict):
         cv.imshow('image', data['img'])
-        cv.imshow('prob_map', data['probMap'])
-        cv.imshow('prob_mask', data['probMask'])
-        cv.imshow('thresh_map', data['threshMap'])
-        cv.imshow('thresh_mask', data['threshMask'])
+        cv.imshow('prob_map', np.uint8(data['probMap'] * 255))
+        cv.imshow('prob_mask', np.uint8(data['probMask'] * 255))
+        cv.imshow('thresh_map', np.uint8(data['threshMap'] * 255))
+        cv.imshow('thresh_mask', np.uint8(data['threshMask'] * 255))
 
     def _build(self, data: Dict) -> Dict:
         img: np.ndarray = data['img']
@@ -35,13 +35,13 @@ class DetCrop:
 
         pad_image: np.ndarray = np.zeros((self._generalSize[1], self._generalSize[0], img.shape[2]), img.dtype)
         pad_image[:h, :w] = cv.resize(img[cropY:cropY + cropH, cropX:cropX + cropW], (w, h))
-        pad_prob_map: np.ndarray = np.zeros((self._generalSize[1], self._generalSize[0], img.shape[2]), img.dtype)
+        pad_prob_map: np.ndarray = np.zeros((self._generalSize[1], self._generalSize[0]), img.dtype)
         pad_prob_map[:h, :w] = cv.resize(data['probMap'][cropY:cropY + cropH, cropX:cropX + cropW], (w, h))
-        pad_prob_mask: np.ndarray = np.zeros((self._generalSize[1], self._generalSize[0], img.shape[2]), img.dtype)
+        pad_prob_mask: np.ndarray = np.zeros((self._generalSize[1], self._generalSize[0]), img.dtype)
         pad_prob_mask[:h, :w] = cv.resize(data['probMask'][cropY:cropY + cropH, cropX:cropX + cropW], (w, h))
-        pad_thresh_map: np.ndarray = np.zeros((self._generalSize[1], self._generalSize[0], img.shape[2]), img.dtype)
+        pad_thresh_map: np.ndarray = np.zeros((self._generalSize[1], self._generalSize[0]), img.dtype)
         pad_thresh_map[:h, :w] = cv.resize(data['threshMap'][cropY:cropY + cropH, cropX:cropX + cropW], (w, h))
-        pad_thresh_mask: np.ndarray = np.zeros((self._generalSize[1], self._generalSize[0], img.shape[2]), img.dtype)
+        pad_thresh_mask: np.ndarray = np.zeros((self._generalSize[1], self._generalSize[0]), img.dtype)
         pad_thresh_mask[:h, :w] = cv.resize(data['threshMask'][cropY:cropY + cropH, cropX:cropX + cropW], (w, h))
 
         new_polygons: List = []
@@ -56,10 +56,10 @@ class DetCrop:
         data['polygon'] = new_polygons
         data['ignore'] = np.array(ignores)
         data['img'] = pad_image
-        data['prob_map'] = pad_prob_map
-        data['prob_mask'] = pad_prob_mask
-        data['thresh_map'] = pad_thresh_map
-        data['thresh_mask'] = pad_thresh_mask
+        data['probMap'] = pad_prob_map
+        data['probMask'] = 1 - pad_prob_mask
+        data['threshMap'] = pad_thresh_map
+        data['threshMask'] = pad_thresh_mask
         return data
 
     def _cropArea(self, img: np.ndarray, polygons: List) -> tuple:

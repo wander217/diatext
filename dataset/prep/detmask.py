@@ -1,6 +1,7 @@
 from typing import Dict
 import cv2 as cv
 import numpy as np
+import pyclipper
 from shapely.geometry import Polygon
 from collections import OrderedDict
 
@@ -27,26 +28,37 @@ class DetMask:
 
     def _build(self, data: Dict) -> Dict:
         img = data['img']
-        prob = np.zeros(img.shape)
-        prob_mask = np.ones(img.shape)
-        thresh_mask = np.zeros(img.shape)
+        prob = np.zeros(img.shape[:2])
+        prob_map = np.zeros(img.shape[:2])
+        prob_mask = np.zeros(img.shape[:2])
+        thresh_mask = np.zeros(img.shape[:2])
         ignore = np.zeros((len(data['target']),)).astype(np.bool)
         boxes = []
         for i, target in enumerate(data['target']):
             tmp = np.array(target['bbox'])
-            boxes.append(tmp)
             polygon = Polygon(tmp)
+            dist = polygon.area * (1 - np.power(0.4, 2)) / polygon.length
+            subject = [tuple(point) for point in tmp]
+            shrinking = pyclipper.PyclipperOffset()
+            shrinking.AddPath(subject, pyclipper.JT_ROUND, pyclipper.ET_CLOSEDPOLYGON)
+            shrinkPolygon = shrinking.Execute(-dist)
+            if len(shrinkPolygon) == 0:
+                ignore[i] = True
+                cv.fillPoly(prob_mask, [tmp.astype(np.int32)], 1)
+                continue
+            boxes.append(tmp)
+            polygon = Polygon(shrinkPolygon[0])
             if not polygon.is_valid \
                     or not polygon.is_simple \
                     or target['text'] == "###" \
                     or polygon.area < self._ignore_thresh:
                 ignore[i] = True
-                cv.fillPoly(prob_mask, [tmp.astype(np.int32)], 0)
+                cv.fillPoly(prob_mask, [tmp.astype(np.int32)], 1)
                 continue
-            cv.fillPoly(prob, [tmp.astype(np.int32)], 1)
+            cv.fillPoly(prob, [np.array(shrinkPolygon[0]).astype(np.int32)], 1)
+            cv.fillPoly(prob_map, [np.array(tmp).astype(np.int32)], 1)
             cv.fillPoly(thresh_mask, [tmp.astype(np.int32)], 1)
-        prob_map = cv.dilate(prob, np.ones((self._dilate, self._dilate)))
-        thresh_map = prob_map - cv.erode(prob, np.ones((self._erode, self._erode)))
+        thresh_map = cv.dilate(prob_map - prob, np.ones((self._erode, self._erode)))
         new_data = OrderedDict(img=img,
                                polygon=boxes,
                                ignore=ignore,

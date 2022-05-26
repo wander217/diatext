@@ -66,9 +66,14 @@ class DetAug:
         """
               Resize image when valid/test
         """
-        org_h, org_w, _ = image.shape
-        new_image = np.zeros((960, 960, 3), dtype=np.uint8)
-        new_image[:org_h, :org_w, :] = image
+        if len(image.shape) == 3:
+            org_h, org_w, _ = image.shape
+            new_image = np.zeros((960, 960, 3), dtype=np.uint8)
+            new_image[:org_h, :org_w] = image
+        else:
+            org_h, org_w = image.shape
+            new_image = np.zeros((960, 960), dtype=np.uint8)
+            new_image[:org_h, :org_w] = image
         return new_image
 
     def _makeAnnotation(self, aug, data: Dict, shape: Tuple) -> Dict:

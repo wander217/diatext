@@ -5,7 +5,7 @@ from dataset.loader import DetDataset
 import yaml
 
 if __name__ == "__main__":
-    configPath = r'D:\workspace\project\diatext\config\adb_eb0.yaml'
+    configPath = r'D:\python_project\diatext\config\adb_eb0.yaml'
 
     with open(configPath, encoding='utf-8') as f:
         config = yaml.safe_load(f)
@@ -16,8 +16,8 @@ if __name__ == "__main__":
     for i in range(0, valid.__len__()):
         data: OrderedDict = valid.__getitem__(i, isVisual=True)
         print(i)
-        break
     #
+
     # train = DetLoader(**config['train']).build()
     # for i, data in enumerate(train):
     #     # print(data.keys())

@@ -23,6 +23,7 @@ class DetTrainer:
                  logger: Dict,
                  totalEpoch: int,
                  startEpoch: int,
+                 save_interval: int,
                  lr: float,
                  factor: float,
                  **kwargs):
@@ -47,6 +48,7 @@ class DetTrainer:
         self._curLR: float = lr
         self._step = 0
         self._loss = 1000.0
+        self._save_interval = save_interval
         self._totalLoss: DetAverager = DetAverager()
         self._probLoss: DetAverager = DetAverager()
         self._threshLoss: DetAverager = DetAverager()
@@ -93,7 +95,7 @@ class DetTrainer:
             self._threshLoss.update(metric['threshLoss'].item() * batchSize, batchSize)
             self._binaryLoss.update(metric['binaryLoss'].item() * batchSize, batchSize)
             self._step += 1
-            if self._step % 150 == 0:
+            if self._step % self._save_interval == 0:
                 validRS = self._validStep()
                 self._model.train()
                 self._save({
@@ -149,6 +151,7 @@ if __name__ == "__main__":
     parser.add_argument("-p", '--path', type=str, help="path of config file")
     parser.add_argument("-d", '--data', default='', type=str, help="path of data")
     parser.add_argument("-i", '--imgType', default=0, type=int, help="type of image")
+    parser.add_argument("-s", '--save_interval', default=150, type=int, help="number of step to save")
     parser.add_argument("-r", '--resume', default='', type=str, help="resume path")
     args = parser.parse_args()
     with open(args.path) as f:
@@ -160,5 +163,5 @@ if __name__ == "__main__":
             config[item]['dataset']['imgType'] = args.imgType
     if args.resume.strip():
         config['checkpoint']['resume'] = args.resume.strip()
-    trainer = DetTrainer(**config)
+    trainer = DetTrainer(**config, save_interval=args.save_interval)
     trainer.train()

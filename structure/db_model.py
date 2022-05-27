@@ -14,15 +14,13 @@ import math
 
 
 class DBModel(nn.Module):
-    def __init__(self, asn: Dict, backbone: Dict, neck: Dict, head: Dict):
+    def __init__(self, backbone: Dict, neck: Dict, head: Dict):
         super().__init__()
-        self._asn = AdaptiveScaleNetwork(**asn)
         self._backbone = DBEfficientNet(**backbone)
         self._neck = DBNeck(**neck)
         self._head = DBHead(**head)
 
     def forward(self, x: Tensor) -> OrderedDict:
-        # asn: Tensor = self._asn(x)
         brs: List = self._backbone(x)
         nrs: Tensor = self._neck(brs)
         hrs: OrderedDict = self._head(nrs)
@@ -31,7 +29,7 @@ class DBModel(nn.Module):
 
 # test
 if __name__ == "__main__":
-    file_config: str = r'D:\python_project\diatext\config\dbpp_se_eb3.yaml'
+    file_config: str = r'D:\db_pp\config\dbpp_se_eb3.yaml'
     with open(file_config) as stream:
         data = yaml.safe_load(stream)
     model = DBModel(**data['lossModel']['model'])
@@ -39,14 +37,7 @@ if __name__ == "__main__":
     train_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print('total params:', total_params)
     print('train params:', train_params)
-    image = cv2.imread(r"D:\python_project\dbpp\google_text\train\image\0a4cbebc7a6f8fba.jpg")
-    h, w, c = image.shape
-    new_image = np.zeros((math.ceil(h / 32) * 32, math.ceil(w / 32) * 32, 3), dtype=np.uint8)
-    new_image[:h, :w] = image
-    x = torch.from_numpy(image).permute(2, 0, 1).unsqueeze(0)
+    a = torch.rand((1, 3, 640, 640), dtype=torch.float)
     start = time.time()
-    b = model(x.float())
+    b = model(a)
     print('run:', time.time() - start)
-    b = b['probMap'].squeeze().cpu().detach().numpy()
-    cv2.imshow("abc", np.uint8(255 * b))
-    cv2.waitKey(0)

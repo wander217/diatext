@@ -5,9 +5,6 @@ factor: 0.9
 
 lossModel:
   model:
-    asn:
-      shape: [ 736, 736 ]
-      hidden_channel: 32
     backbone:
       netID: 'b3'
       depthProb: 0.2

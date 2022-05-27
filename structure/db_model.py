@@ -13,26 +13,6 @@ import yaml
 import math
 
 
-def weight_init(module):
-    if isinstance(module, nn.Conv2d):
-        nn.init.kaiming_normal_(module.weight, mode='fan_out')
-        if module.bias is not None:
-            nn.init.zeros_(module.bias)
-    if isinstance(module, nn.Conv1d):
-        nn.init.kaiming_normal_(module.weight, mode='fan_out')
-        if module.bias is not None:
-            nn.init.zeros_(module.bias)
-    elif isinstance(module, (nn.BatchNorm2d, nn.GroupNorm)):
-        nn.init.ones_(module.weight)
-        if module.bias is not None:
-            nn.init.zeros_(module.bias)
-    elif isinstance(module, nn.Linear):
-        init_range = 1 / math.sqrt(module.out_features)
-        nn.init.uniform_(module.weight, -init_range, init_range)
-        if module.bias is not None:
-            nn.init.zeros_(module.bias)
-
-
 class DBModel(nn.Module):
     def __init__(self, asn: Dict, backbone: Dict, neck: Dict, head: Dict):
         super().__init__()
@@ -40,7 +20,6 @@ class DBModel(nn.Module):
         self._backbone = DBEfficientNet(**backbone)
         self._neck = DBNeck(**neck)
         self._head = DBHead(**head)
-        self.apply(weight_init)
 
     def forward(self, x: Tensor) -> OrderedDict:
         asn: Tensor = self._asn(x)

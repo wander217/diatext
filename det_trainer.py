@@ -65,7 +65,7 @@ class DetTrainer:
         if stateDict is not None:
             self._model.load_state_dict(stateDict[0])
             self._optim.load_state_dict(stateDict[1])
-            self._startEpoch = stateDict[2] + 1
+            self._step = stateDict[2] + 1
 
     def train(self):
         self._load()
@@ -152,6 +152,7 @@ if __name__ == "__main__":
     parser.add_argument("-d", '--data', default='', type=str, help="path of data")
     parser.add_argument("-i", '--imgType', default=0, type=int, help="type of image")
     parser.add_argument("-s", '--save_interval', default=150, type=int, help="number of step to save")
+    parser.add_argument("-b", '--start_epoch', default=1, type=int, help="start epoch")
     parser.add_argument("-r", '--resume', default='', type=str, help="resume path")
     args = parser.parse_args()
     with open(args.path) as f:
@@ -163,5 +164,5 @@ if __name__ == "__main__":
             config[item]['dataset']['imgType'] = args.imgType
     if args.resume.strip():
         config['checkpoint']['resume'] = args.resume.strip()
-    trainer = DetTrainer(**config, save_interval=args.save_interval)
+    trainer = DetTrainer(**config, save_interval=args.save_interval, startEpoch=args.start_epoch)
     trainer.train()

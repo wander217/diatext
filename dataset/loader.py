@@ -66,10 +66,8 @@ class DetDataset(Dataset):
             return self.__getitem__(random.randint(0, self.__len__() - 1), isVisual)
 
     def __len__(self):
-        # return len(self._imgPath)
-        if self._train:
-            return 40
-        return 8
+        return len(self._imgPath)
+
 
 class DetCollate:
     def __init__(self):

@@ -36,7 +36,6 @@ class DetCrop:
         if self._crop:
             cropX, cropY, cropW, cropH = self._cropArea(img, polygon_list)
         else:
-            print("anc")
             cropX, cropY, cropW, cropH = 0, 0, img.shape[0], img.shape[1]
         scaleW: float = self._generalSize[0] / cropW
         scaleH: float = self._generalSize[1] / cropH

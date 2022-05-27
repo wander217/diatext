@@ -43,11 +43,9 @@ class DBModel(nn.Module):
         self.apply(weight_init)
 
     def forward(self, x: Tensor) -> OrderedDict:
-        b, _, h, w = x.size()
-        asn: Tensor = self._asn(x)
-        brs: List = self._backbone(asn)
+        brs: List = self._backbone(x)
         nrs: Tensor = self._neck(brs)
-        hrs: OrderedDict = self._head(nrs, [h, w])
+        hrs: OrderedDict = self._head(nrs)
         return hrs
 
 

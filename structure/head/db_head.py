@@ -17,7 +17,8 @@ class DBHead(nn.Module):
             nn.ConvTranspose2d(exp_output, exp_output, kernel_size=2, stride=2),
             nn.BatchNorm2d(exp_output),
             nn.ReLU(inplace=True),
-            nn.ConvTranspose2d(exp_output, 1, kernel_size=2, stride=2))
+            nn.ConvTranspose2d(exp_output, 1, kernel_size=2, stride=2),
+            nn.Hardsigmoid(inplace=True))
 
         self.thresh: nn.Module = nn.Sequential(
             nn.Conv2d(exp, exp_output, kernel_size=3, padding=1),
@@ -26,18 +27,19 @@ class DBHead(nn.Module):
             nn.ConvTranspose2d(exp_output, exp_output, kernel_size=2, stride=2),
             nn.BatchNorm2d(exp_output),
             nn.ReLU(inplace=True),
-            nn.ConvTranspose2d(exp_output, 1, kernel_size=2, stride=2))
+            nn.ConvTranspose2d(exp_output, 1, kernel_size=2, stride=2),
+            nn.Hardsigmoid(inplace=True))
 
     def resize(self, x: Tensor, shape: List):
         return F.interpolate(x, shape, mode="bilinear", align_corners=False)
 
-    def forward(self, x: Tensor, shape: List) -> OrderedDict:
+    def forward(self, x: Tensor) -> OrderedDict:
         result: OrderedDict = OrderedDict()
         # calculate probability map
         probMap: Tensor = self.prob(x)
         threshMap:Tensor = self.thresh(x)
-        binaryMap: Tensor = F.sigmoid(probMap - threshMap)
-        result.update(probMap=F.sigmoid(self.resize(probMap, shape)),
-                      threshMap=F.sigmoid(self.resize(threshMap, shape)),
-                      binaryMap=F.sigmoid(self.resize(binaryMap, shape)))
+        binaryMap: Tensor = F.hardsigmoid(probMap - threshMap)
+        result.update(probMap=probMap,
+                      threshMap=threshMap,
+                      binaryMap=binaryMap)
         return result

@@ -34,13 +34,13 @@ class DetAug:
     def _visual(self, data: Dict, lineHeight: int = 2):
         img = data['img']
         tars = data['target']
-        for tar in tars:
-            cv.polylines(img,
-                         [np.int32(tar['polygon']).reshape((1, -1, 2))],
-                         True,
-                         (255, 255, 0),
-                         lineHeight)
-        cv.imshow('aug_visual', img)
+        # for tar in tars:
+        #     cv.polylines(img,
+        #                  [np.int32(tar['polygon']).reshape((1, -1, 2))],
+        #                  True,
+        #                  (255, 255, 0),
+        #                  lineHeight)
+        # cv.imshow('aug_visual', img)
 
     def _build(self, data: Dict) -> Dict:
         image: np.ndarray = data['img']

@@ -1,6 +1,4 @@
 from collections import OrderedDict
-import cv2
-import numpy as np
 from torch import nn, Tensor
 from structure.backbone import DBEfficientNet
 from structure.neck import DBNeck
@@ -9,7 +7,6 @@ from typing import List, Dict
 import torch
 import time
 import yaml
-import math
 
 
 class DBModel(nn.Module):

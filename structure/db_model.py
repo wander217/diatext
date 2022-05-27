@@ -22,8 +22,8 @@ class DBModel(nn.Module):
         self._head = DBHead(**head)
 
     def forward(self, x: Tensor) -> OrderedDict:
-        asn: Tensor = self._asn(x)
-        brs: List = self._backbone(asn)
+        # asn: Tensor = self._asn(x)
+        brs: List = self._backbone(x)
         nrs: Tensor = self._neck(brs)
         hrs: OrderedDict = self._head(nrs)
         return hrs

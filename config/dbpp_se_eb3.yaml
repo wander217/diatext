@@ -68,7 +68,7 @@ train:
         crop: True
         minCropSize: 0.1
         maxTries: 10
-        generalSize: [ 736, 736 ]
+        generalSize: [ 640, 640 ]
       DetForm:
         shrinkRatio: 0.4
       ProbMaker:
@@ -102,7 +102,7 @@ valid:
         crop: False
         minCropSize: 0.1
         maxTries: 10
-        generalSize: [ 736, 736 ]
+        generalSize: [ 960, 960 ]
       DetForm:
         shrinkRatio: 0.4
       ProbMaker:

@@ -164,5 +164,6 @@ if __name__ == "__main__":
             config[item]['dataset']['imgType'] = args.imgType
     if args.resume.strip():
         config['checkpoint']['resume'] = args.resume.strip()
-    trainer = DetTrainer(**config, save_interval=args.save_interval, startEpoch=args.start_epoch)
+    config['startEpoch'] = args.start_epoch
+    trainer = DetTrainer(**config, save_interval=args.save_interval)
     trainer.train()

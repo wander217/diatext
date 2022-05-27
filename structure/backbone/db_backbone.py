@@ -67,6 +67,20 @@ class DBEfficientNet(nn.Module):
             )
         )  # (8): w/32 * h/32 ->Chọn
 
+        # Cài đặt giá trị ban đầu
+        for module in self.modules():
+            if isinstance(module, nn.Conv2d):
+                nn.init.kaiming_normal_(module.weight, mode='fan_out')
+                if module.bias is not None:
+                    nn.init.zeros_(module.bias)
+            elif isinstance(module, (nn.BatchNorm2d, nn.GroupNorm)):
+                nn.init.ones_(module.weight)
+                nn.init.zeros_(module.bias)
+            elif isinstance(module, nn.Linear):
+                init_range = 1 / math.sqrt(module.out_features)
+                nn.init.uniform_(module.weight, -init_range, init_range)
+                nn.init.zeros_(module.bias)
+
     def forward(self, input: Tensor) -> List:
         features: List = []
         for i in range(len(self.layers)):

@@ -1,8 +1,11 @@
+import json
 import os
 import time
 from loss_model import LossModel
 import torch
 import yaml
+
+from measure import DetAcc
 from measure.metric import DetScore
 from typing import Dict, List, Tuple, OrderedDict
 import numpy as np
@@ -27,20 +30,13 @@ class DBPredictor:
 
     def _resize(self, image: np.ndarray) -> Tuple:
         org_h, org_w, _ = image.shape
-        # scale = self._limit / org_h
-        # new_h = math.ceil(org_h / 32) * 32
-        # scale = 0.705 if org_h > self._limit else scale
-        # # new_w = math.ceil(org_w / org_h * new_h)
-        # new_h = math.ceil(scale * org_h)
-        # new_w = math.ceil(scale * org_w)
-        new_h = math.ceil(org_h / 32) * 32
-        new_w = math.ceil(org_w / 32) * 32
-        new_image = np.zeros((math.ceil(new_h / 32) * 32,
-                              math.ceil(new_w / 32) * 32, 3), dtype=np.uint8)
-        image = cv.resize(image, (new_w, new_h), interpolation=cv.INTER_LINEAR)
-        new_image[:new_h, :new_w, :] = image
-        print(new_w, new_h)
-        return new_image, new_h, new_w
+        # scale = min([self._limit / org_h, self._limit / org_w])
+        # new_h = int(scale * org_h)
+        # new_w = int(scale * org_w)
+        new_image = np.zeros((self._limit, self._limit, 3), dtype=np.uint8)
+        # image = cv.resize(image, (new_w, new_h), interpolation=cv.INTER_CUBIC)
+        new_image[:org_h, :org_w, :] = image
+        return new_image, org_h, org_w
 
     def _normalize(self, image: np.ndarray) -> np.ndarray:
         mean = [122.67891434, 116.66876762, 104.00698793]
@@ -57,51 +53,49 @@ class DBPredictor:
             h, w, _ = image.shape
             reImage, newH, newW = self._resize(image)
             inputImage = self._normalize(reImage)
-            pred: OrderedDict = self._model(dict(img=inputImage, orgShape=[newH, newW]), training=False)
-            bs, ss = self._score(pred, dict(img=inputImage, orgShape=[960, 960]))
-            for i in range(len(bs[0])):
-                if ss[0][i] > 0:
-                    bboxes.append(bs[0][i])
-                    scores.append(ss[0][i])
-            return bboxes, scores
+            pred: OrderedDict = self._model(dict(img=inputImage), training=False)
+            bs, ss = self._score(pred, dict(img=inputImage))
+
+            # for i in range(len(bs[0])):
+            #     if ss[0][i] > 0:
+            #         bboxes.append(bs[0][i])
+            #         # bboxes.append(bs[0][i] * np.array([w / newW, h / newH]))
+            #         scores.append(ss[0][i])
+            return bs, ss
 
 
 if __name__ == "__main__":
-    configPath: str = r'D:\python_project\diatext\config\adb_eb0.yaml'
-    pretrainedPath: str = r'D:\python_project\diatext\checkpoint_1200.pth'
-    # configPath: str = r'config/dbpp_eb0.yaml'
-    # pretrainedPath: str = r'pretrained/eb0/checkpoint_941.pth'
-    # imgPath: str = r'C:\Users\thinhtq\Downloads\vietnamese_original\vietnamese\unseen_test_images\im1999.jpg'
-    imgPath: str = r'D:\python_project\dbpp\google_text\valid\image\00b1edd2d4f04296.jpg'
+    configPath: str = r'config/dbpp_se_eb0.yaml'
+    pretrainedPath: str = r'D:\python_project\dbpp\pretrained\abc\checkpoint_602.pth'
     predictor = DBPredictor(configPath, pretrainedPath)
-    img = cv.imread(imgPath)
-    start = time.time()
-    boxes, scores = predictor(img)
-    print(len(boxes))
-    for box in boxes:
-        img = cv.polylines(img, [box], True, (0, 0, 255), 2)
-    cv.imwrite("abc.jpg", img)
-    cv.imshow("abc", img)
-    cv.waitKey(0)
-    # cv.imshow("result", img)
-    # cv.waitKey(0)
-    # cv.imwrite("result/test.jpg", img)
-    # end = time.time() - start
-    # print("Process time:", end)
-    # root: str = r'C:\Users\thinhtq\Downloads\pdftoimage (1)'
-    # count = 0
-    # for subRoot, dirs, files in os.walk(root):
-    #     for file in files:
-    #         if file.endswith(".jpg"):
-    #             print(file)
-    #             img = cv.imread(os.path.join(subRoot, file))
-    #             if img is None:
-    #                 count+=1
-    #                 continue
-    #             # kernel = np.ones((3, 3), dtype=np.uint8)
-    #             # img = cv.erode(img, kernel, iterations=1)
-    #             boxes, scores = predictor(img)
-    #             for box in boxes:
-    #                 img = cv.polylines(img, [box], True, (0, 0, 255), 2)
-    #             cv.imwrite("result5/test{}.jpg".format(count), img)
-    #             count += 1
+    root: str = r'D:\python_project\dbpp\breg_detection\test\image'
+    count = 0
+    precision, recall, f1score = 0, 0, 0
+    for subRoot, dirs, files in os.walk(root):
+        for file in files:
+            if file.endswith(".png") or file.endswith(".jpg"):
+                img = cv.imread(os.path.join(subRoot, file))
+                boxes, scores = predictor(img)
+                with open(r"D:\python_project\dbpp\breg_detection\test\target.json", encoding='utf-8') as f:
+                    data = json.loads(f.readline())
+                gt = {
+                    "polygon": [[]],
+                    "ignore": [[]]
+                }
+                for item in data:
+                    if item['file_name'] == file:
+                        for bbox in item['target']:
+                            gt['polygon'][0].append(bbox['bbox'])
+                            gt['ignore'][0].append(False)
+                det_acc = DetAcc(0.5, 0.5, 0.3)
+                det_acc(boxes, scores, gt)
+                result = det_acc.gather()
+                print(result)
+                result['file_name'] = "test{}.jpg".format(count)
+                recall += result['recall']
+                precision += result['precision']
+                f1score += result['f1score']
+                count += 1
+    print("recall: {}, precision: {}, f1score: {}".format(recall / count,
+                                                          precision / count,
+                                                          f1score / count))

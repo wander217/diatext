@@ -68,9 +68,8 @@ class DetDataset(Dataset):
     def __len__(self):
         # return len(self._imgPath)
         if self._train:
-            return 20
-        return 5
-
+            return 40
+        return 8
 
 class DetCollate:
     def __init__(self):
@@ -112,7 +111,6 @@ class DetCollate:
             probMask=torch.from_numpy(np.asarray(probMasks, dtype=np.int16)),
             threshMap=torch.from_numpy(np.asarray(threshMaps, dtype=np.float64)).float(),
             threshMask=torch.from_numpy(np.asarray(threshMasks, dtype=np.int16)),
-            orgShape=[960, 960]
         )
         if len(polygons) != 0:
             output.update(polygon=torch.from_numpy(np.asarray(polygons, dtype=np.int32)))

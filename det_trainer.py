@@ -93,7 +93,7 @@ class DetTrainer:
             self._threshLoss.update(metric['threshLoss'].item() * batchSize, batchSize)
             self._binaryLoss.update(metric['binaryLoss'].item() * batchSize, batchSize)
             self._step += 1
-            if self._step % 20  == 0:
+            if self._step % 86 == 0:
                 validRS = self._validStep()
                 self._model.train()
                 self._save({
@@ -124,32 +124,34 @@ class DetTrainer:
                 probLoss.update(metric['probLoss'].item() * batchSize, batchSize)
                 threshLoss.update(metric['threshLoss'].item() * batchSize, batchSize)
                 binaryLoss.update(metric['binaryLoss'].item() * batchSize, batchSize)
-                # self._acc(*self._score(pred, batch), batch)
-                # measure = self._acc.gather()
-                # precision.update(measure['precision'] * batchSize, batchSize)
-                # recall.update(measure['recall'] * batchSize, batchSize)
-                # f1score.update(measure['f1score'] * batchSize, batchSize)
+                self._acc(*self._score(pred, batch), batch)
+                measure = self._acc.gather()
+                # print(measure)
+                precision.update(measure['precision'] * batchSize, batchSize)
+                recall.update(measure['recall'] * batchSize, batchSize)
+                f1score.update(measure['f1score'] * batchSize, batchSize)
         return {
             'totalLoss': totalLoss.calc(),
             'probLoss': probLoss.calc(),
             'threshLoss': threshLoss.calc(),
             'binaryLoss': binaryLoss.calc(),
-            # 'precision': precision.calc(),
-            # 'recall': recall.calc(),
-            # 'f1score': f1score.calc(),
+            'precision': precision.calc(),
+            'recall': recall.calc(),
+            'f1score': f1score.calc(),
         }
 
     def _save(self, trainRS: Dict, validRS: Dict):
-        # if validRS['f1score'] > self._f1score:
-        #     self._f1score = validRS['f1score']
-        self._checkpoint.saveCheckpoint(self._step, self._model, self._optim)
+        if validRS['f1score'] > self._f1score:
+            self._f1score = validRS['f1score']
+            self._checkpoint.saveCheckpoint(self._step, self._model, self._optim)
         self._logger.reportTime("Step {}:".format(self._step))
         self._logger.reportMetric(" - Training", trainRS)
         self._logger.reportMetric(" - Validation", validRS)
+        self._logger.reportMetric(" - Best", {"f1score": self._f1score})
         self._logger.writeFile({
             'training': trainRS,
             'validation': validRS,
-            # "best": self._f1score
+            "best": self._f1score
         })
         self._checkpoint.saveModel(self._model, self._step)
 

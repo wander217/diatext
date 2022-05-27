@@ -14,11 +14,12 @@ class LossModel(nn.Module):
         self._loss = self._loss.to(self._device)
 
     def forward(self, batch: OrderedDict, training: bool = True):
-        for key, value in batch.items():
-            if (value is not None) and hasattr(value, 'to'):
-                batch[key] = value.to(self._device)
-        pred: OrderedDict = self._model(batch['img'])
         if training:
+            for key, value in batch.items():
+                if (value is not None) and hasattr(value, 'to'):
+                    batch[key] = value.to(self._device)
+            pred: OrderedDict = self._model(batch['img'])
             loss, metric = self._loss(pred, batch)
             return pred, loss, metric
-        return pred
+        batch['img'] = batch['img'].to(self._device)
+        return self._model(batch['img'])

@@ -48,9 +48,9 @@ train:
   shuffle: True
   pinMemory: False
   dataset:
-    imgType: 0
-    imgDir: 'D:\python_project\dbpp\google_text\train/image'
-    tarFile: 'D:\python_project\dbpp\google_text\train/target.json'
+    imgType: 1
+    imgDir: 'D:\python_project\diatext\vintext\train/image'
+    tarFile: 'D:\python_project\diatext\vintext\train/target.json'
     prep:
       DetAug:
         onlyResize: False
@@ -87,9 +87,9 @@ valid:
   shuffle: False
   pinMemory: False
   dataset:
-    imgType: 0
-    imgDir: 'D:\python_project\dbpp\google_text\valid/image'
-    tarFile: 'D:\python_project\dbpp\google_text\valid/target.json'
+    imgType: 1
+    imgDir: 'D:\python_project\diatext\vintext\valid/image'
+    tarFile: 'D:\python_project\diatext\vintext\valid/target.json'
     prep:
       DetAug:
         onlyResize: True

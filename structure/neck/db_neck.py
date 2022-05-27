@@ -15,22 +15,37 @@ class DBNeck(nn.Module):
         self.in2: nn.Module = nn.Conv2d(dataPoint[-4], exp, kernel_size=1, bias=bias)
 
         # Upsampling layer
-        self.up5: nn.Module = nn.Upsample(scale_factor=2)
-        self.up4: nn.Module = nn.Upsample(scale_factor=2)
-        self.up3: nn.Module = nn.Upsample(scale_factor=2)
+        self.up5: nn.Module = nn.Sequential(
+            nn.ConvTranspose2d(exp, exp, kernel_size=2, stride=2, bias=bias),
+            nn.BatchNorm2d(exp),
+            nn.ReLU(inplace=True))
+        self.up4: nn.Module = nn.Sequential(
+            nn.ConvTranspose2d(exp, exp, kernel_size=2, stride=2, bias=bias),
+            nn.BatchNorm2d(exp),
+            nn.ReLU(inplace=True))
+        self.up3: nn.Module = nn.Sequential(
+            nn.ConvTranspose2d(exp, exp, kernel_size=2, stride=2, bias=bias),
+            nn.BatchNorm2d(exp),
+            nn.ReLU(inplace=True))
 
         expOutput: int = exp // 4
         self.out5: nn.Module = nn.Sequential(
             nn.Conv2d(exp, expOutput, kernel_size=3, padding=1, bias=bias),
-            nn.Upsample(scale_factor=8, mode='bilinear')
+            nn.ConvTranspose2d(expOutput, expOutput, kernel_size=8, stride=8, bias=bias),
+            nn.BatchNorm2d(expOutput),
+            nn.ReLU(inplace=True)
         )
         self.out4: nn.Module = nn.Sequential(
             nn.Conv2d(exp, expOutput, kernel_size=3, padding=1, bias=bias),
-            nn.Upsample(scale_factor=4, mode='bilinear')
+            nn.ConvTranspose2d(expOutput, expOutput, kernel_size=4, stride=4, bias=bias),
+            nn.BatchNorm2d(expOutput),
+            nn.ReLU(inplace=True)
         )
         self.out3: nn.Module = nn.Sequential(
             nn.Conv2d(exp, expOutput, kernel_size=3, padding=1, bias=bias),
-            nn.Upsample(scale_factor=2, mode='bilinear')
+            nn.ConvTranspose2d(expOutput, expOutput, kernel_size=2, stride=2, bias=bias),
+            nn.BatchNorm2d(expOutput),
+            nn.ReLU(inplace=True)
         )
         self.out2: nn.Module = nn.Sequential(
             nn.Conv2d(exp, expOutput, kernel_size=3, padding=1, bias=bias)
@@ -81,6 +96,7 @@ class DBNeck(nn.Module):
         fout2: Tensor = self.out2(fup2)
 
         # Concatenate
-        fusion: Tensor = torch.cat([fout5, fout4, fout3, fout2], 1)
-        adaptiveFusion: Tensor = self.adaptiveScale(fusion, [fout5, fout4, fout3, fout2])
+        tmp = [fout5, fout4, fout3, fout2]
+        fusion: Tensor = torch.cat(tmp, 1)
+        adaptiveFusion: Tensor = self.adaptiveScale(fusion, tmp)
         return adaptiveFusion

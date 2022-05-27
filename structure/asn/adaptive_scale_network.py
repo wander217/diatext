@@ -30,15 +30,12 @@ class AdaptiveScaleNetwork(nn.Module):
             nn.BatchNorm2d(hidden_channel),
             nn.Conv2d(32, hidden_channel, 3, 1, 1),
             nn.BatchNorm2d(hidden_channel))
-        self._conv: nn.Module = nn.Sequential(
-            nn.Conv2d(hidden_channel, 3, 3, 1, 1),
-            nn.BatchNorm2d(3),
-            nn.Hardsigmoid(inplace=True))
+        self._conv: nn.Module = nn.Sequential(nn.Conv2d(hidden_channel, 3, 3, 1, 1))
 
     def forward(self, x: Tensor):
         y: Tensor = resize(self._weight_init(x), self._shape)
         y = self._residual(y) + y
-        y = self._conv(y) * resize(x, self._shape)
+        y = self._conv(y) + resize(x, self._shape)
         return y
 
 

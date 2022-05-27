@@ -84,9 +84,9 @@ class DetAug:
                 newPolygon: List = [(keyPoint.x, keyPoint.y)
                                     for keyPoint in keyPoints]
             tars.append({
-                'label': tar['label'],
+                'label': tar['text'],
                 'polygon': newPolygon,
-                'ignore': tar['label'] == '###'
+                'ignore': tar['text'] == '###'
             })
         data['target'] = tars
         return data

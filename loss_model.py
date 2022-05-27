@@ -17,7 +17,7 @@ class LossModel(nn.Module):
         for key, value in batch.items():
             if (value is not None) and hasattr(value, 'to'):
                 batch[key] = value.to(self._device)
-        pred: OrderedDict = self._model(batch['img'], batch['orgShape'])
+        pred: OrderedDict = self._model(batch['img'])
         if training:
             loss, metric = self._loss(pred, batch)
             return pred, loss, metric

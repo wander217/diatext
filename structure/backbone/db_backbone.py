@@ -34,7 +34,7 @@ class DBEfficientNet(nn.Module):
         ]
         firstOutChannel: int = self.config[0].inChannel
         self.layers: nn.ModuleList = nn.ModuleList([
-            ConvNormActivation(in_channels=3,
+            ConvNormActivation(in_channels=1,
                                out_channels=firstOutChannel,
                                kernel_size=3,
                                stride=2,

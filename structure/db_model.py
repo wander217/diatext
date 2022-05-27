@@ -5,7 +5,6 @@ from torch import nn, Tensor
 from structure.backbone import DBEfficientNet
 from structure.neck import DBNeck
 from structure.head import DBHead
-from structure.asn import AdaptiveScaleNetwork
 from typing import List, Dict
 import torch
 import time

@@ -10,7 +10,7 @@ lossModel:
       depthProb: 0.2
       useSE: True
     neck:
-      dataPoint: [ 24, 40, 112, 1280 ]
+      data_point: [ 24, 40, 112, 1280 ]
       exp: 256
     head:
       k: 50
@@ -32,7 +32,7 @@ lossModel:
 score:
   totalBox: 1000
   edgeThresh: 5
-  probThresh: 0.1
+  probThresh: 0.3
   scoreThresh: 0.7
   label: 'binaryMap'
 
@@ -43,14 +43,14 @@ accurancy:
 
 train:
   batchSize: 8
-  numWorkers: 2
+  numWorkers: 4
   dropLast: True
   shuffle: True
   pinMemory: False
   dataset:
-    imgType: 0
-    imgDir: 'D:\python_project\dbpp\google_text\train/image'
-    tarFile: 'D:\python_project\dbpp\google_text\train/target.json'
+    imgType: 1
+    imgDir: 'D:\python_project\diatext\vintext\train/image'
+    tarFile: 'D:\python_project\diatext\vintext\train/target.json'
     prep:
       DetAug:
         onlyResize: False
@@ -62,6 +62,7 @@ train:
         Resize:
           size: [ 0.5, 3. ]
       DetCrop:
+        crop: True
         minCropSize: 0.1
         maxTries: 10
         generalSize: [ 640, 640 ]
@@ -80,20 +81,25 @@ train:
         key: [ 'polygon', 'shape', 'ignore', 'train' ]
 
 valid:
-  batchSize: 8
-  numWorkers: 2
+  batchSize: 1
+  numWorkers: 4
   dropLast: False
   shuffle: False
   pinMemory: False
   dataset:
-    imgType: 0
-    imgDir: 'D:\python_project\dbpp\google_text\valid/image'
-    tarFile: 'D:\python_project\dbpp\google_text\valid/target.json'
+    imgType: 1
+    imgDir: 'D:\python_project\diatext\vintext\valid/image'
+    tarFile: 'D:\python_project\diatext\vintext\valid/target.json'
     prep:
       DetAug:
         onlyResize: True
         Resize:
           size: { "height": 960, "width": 960 }
+      DetCrop:
+        crop: False
+        minCropSize: 0.1
+        maxTries: 10
+        generalSize: [ 960, 960 ]
       DetForm:
         shrinkRatio: 0.4
       ProbMaker:
@@ -106,7 +112,7 @@ valid:
       DetNorm:
         mean: [ 122.67891434, 116.66876762, 104.00698793 ]
       DetFilter:
-        key: [ 'polygon', 'shape', 'ignore', 'train' ]
+        key: [ 'train' ]
 
 optimizer:
   name: Adam

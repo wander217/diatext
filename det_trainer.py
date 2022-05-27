@@ -46,7 +46,7 @@ class DetTrainer:
         self._startEpoch: int = startEpoch
         self._curLR: float = lr
         self._step = 0
-        self._f1score = 0.0
+        self._loss = 1000.0
         self._totalLoss: DetAverager = DetAverager()
         self._probLoss: DetAverager = DetAverager()
         self._threshLoss: DetAverager = DetAverager()
@@ -113,9 +113,6 @@ class DetTrainer:
         threshLoss: DetAverager = DetAverager()
         probLoss: DetAverager = DetAverager()
         binaryLoss: DetAverager = DetAverager()
-        precision: DetAverager = DetAverager()
-        recall: DetAverager = DetAverager()
-        f1score: DetAverager = DetAverager()
         with torch.no_grad():
             for batch in self._valid:
                 batchSize: int = batch['img'].size(0)
@@ -124,34 +121,24 @@ class DetTrainer:
                 probLoss.update(metric['probLoss'].item() * batchSize, batchSize)
                 threshLoss.update(metric['threshLoss'].item() * batchSize, batchSize)
                 binaryLoss.update(metric['binaryLoss'].item() * batchSize, batchSize)
-                self._acc(*self._score(pred, batch), batch)
-                measure = self._acc.gather()
-                # print(measure)
-                precision.update(measure['precision'] * batchSize, batchSize)
-                recall.update(measure['recall'] * batchSize, batchSize)
-                f1score.update(measure['f1score'] * batchSize, batchSize)
         return {
             'totalLoss': totalLoss.calc(),
             'probLoss': probLoss.calc(),
             'threshLoss': threshLoss.calc(),
-            'binaryLoss': binaryLoss.calc(),
-            'precision': precision.calc(),
-            'recall': recall.calc(),
-            'f1score': f1score.calc(),
+            'binaryLoss': binaryLoss.calc()
         }
 
     def _save(self, trainRS: Dict, validRS: Dict):
-        if validRS['f1score'] > self._f1score:
-            self._f1score = validRS['f1score']
+        if validRS['totalLoss'] < self._loss:
+            self._loss = validRS['totalLoss']
             self._checkpoint.saveCheckpoint(self._step, self._model, self._optim)
         self._logger.reportTime("Step {}:".format(self._step))
         self._logger.reportMetric(" - Training", trainRS)
         self._logger.reportMetric(" - Validation", validRS)
-        self._logger.reportMetric(" - Best", {"f1score": self._f1score})
+        self._logger.reportMetric(" - Min_loss", {"total_loss": self._loss})
         self._logger.writeFile({
             'training': trainRS,
-            'validation': validRS,
-            "best": self._f1score
+            'validation': validRS
         })
         self._checkpoint.saveModel(self._model, self._step)
 

@@ -42,11 +42,12 @@ class DBModel(nn.Module):
         self._head = DBHead(**head)
         self.apply(weight_init)
 
-    def forward(self, x: Tensor, shape: List) -> OrderedDict:
+    def forward(self, x: Tensor) -> OrderedDict:
+        b, _, h, w = x.size()
         asn: Tensor = self._asn(x)
         brs: List = self._backbone(asn)
         nrs: Tensor = self._neck(brs)
-        hrs: OrderedDict = self._head(nrs, shape)
+        hrs: OrderedDict = self._head(nrs, [h, w])
         return hrs
 
 
@@ -66,7 +67,7 @@ if __name__ == "__main__":
     new_image[:h, :w] = image
     x = torch.from_numpy(image).permute(2, 0, 1).unsqueeze(0)
     start = time.time()
-    b = model(x.float(), (1024, 1024))
+    b = model(x.float())
     print('run:', time.time() - start)
     b = b['probMap'].squeeze().cpu().detach().numpy()
     cv2.imshow("abc", np.uint8(255 * b))

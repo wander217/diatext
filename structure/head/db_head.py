@@ -6,9 +6,8 @@ import torch.nn.functional as F
 
 
 class DBHead(nn.Module):
-    def __init__(self, exp: int, thresh: int):
+    def __init__(self, exp: int):
         super().__init__()
-        self.thresh: int = thresh
 
         exp_output: int = exp // 4
         self.prob: nn.Module = nn.Sequential(
@@ -41,7 +40,7 @@ class DBHead(nn.Module):
         # calculate probability map
         probMap: Tensor = self.prob(x)
         threshMap:Tensor = self.thresh(x)
-        binaryMap: Tensor = F.hardsigmoid(probMap - threshMap)
+        binaryMap: Tensor = F.sigmoid(probMap - threshMap)
         result.update(probMap=self.resize(probMap, shape),
                       threshMap=self.resize(threshMap, shape),
                       binaryMap=self.resize(binaryMap, shape))

@@ -133,7 +133,8 @@ class DetTrainer:
     def _save(self, trainRS: Dict, validRS: Dict):
         if validRS['totalLoss'] < self._loss:
             self._loss = validRS['totalLoss']
-            self._checkpoint.saveCheckpoint(self._step, self._model, self._optim)
+            self._checkpoint.saveModel(self._model, self._step)
+        self._checkpoint.saveCheckpoint(self._step, self._model, self._optim)
         self._logger.reportTime("Step {}:".format(self._step))
         self._logger.reportMetric(" - Training", trainRS)
         self._logger.reportMetric(" - Validation", validRS)
@@ -142,7 +143,6 @@ class DetTrainer:
             'training': trainRS,
             'validation': validRS
         })
-        self._checkpoint.saveModel(self._model, self._step)
 
 
 if __name__ == "__main__":

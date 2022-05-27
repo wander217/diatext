@@ -65,9 +65,10 @@ train:
         Resize:
           size: [ 0.5, 3. ]
       DetCrop:
+        crop: True
         minCropSize: 0.1
         maxTries: 10
-        generalSize: [ 640, 640 ]
+        generalSize: [ 736, 736 ]
       DetForm:
         shrinkRatio: 0.4
       ProbMaker:
@@ -98,9 +99,10 @@ valid:
         Resize:
           size: { "height": 960, "width": 960 }
       DetCrop:
+        crop: False
         minCropSize: 0.1
         maxTries: 10
-        generalSize: [ 640, 640 ]
+        generalSize: [ 736, 736 ]
       DetForm:
         shrinkRatio: 0.4
       ProbMaker:

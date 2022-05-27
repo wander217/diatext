@@ -6,10 +6,11 @@ from typing import List, Dict, Tuple
 
 
 class DetCrop:
-    def __init__(self, generalSize: List, maxTries: int, minCropSize: float):
+    def __init__(self, generalSize: List, maxTries: int, minCropSize: float, crop:bool):
         self._generalSize: List = generalSize
         self._maxTries: int = maxTries
         self._minCropSize: float = minCropSize
+        self._crop:bool = crop
 
     def __call__(self, data: Dict, isVisual: bool = False) -> Dict:
         output: Dict = self._build(data)
@@ -32,9 +33,10 @@ class DetCrop:
         img: np.ndarray = data['img']
         orgAnno: List = data['target']
         polygon_list: List = [tar['polygon'] for tar in orgAnno if not tar['ignore']]
-        if data['train']:
+        if self._crop:
             cropX, cropY, cropW, cropH = self._cropArea(img, polygon_list)
         else:
+            print("anc")
             cropX, cropY, cropW, cropH = 0, 0, img.shape[0], img.shape[1]
         scaleW: float = self._generalSize[0] / cropW
         scaleH: float = self._generalSize[1] / cropH

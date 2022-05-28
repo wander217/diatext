@@ -65,7 +65,7 @@ se_eb3 = {
                         "p": 0.5
                     },
                     "Affine": {
-                        "rotate": (-10, 10),
+                        "rotate": (-20, 20),
                         "fit_output": True
                     },
                     "Resize": {

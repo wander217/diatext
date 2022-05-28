@@ -56,8 +56,8 @@ se_eb3 = {
         "pinMemory": False,
         "dataset": {
             "imgType": 1,
-            "imgDir": "D:\\python_project\\diatext\\vintext\\train/image",
-            "tarFile": "D:\\python_project\\diatext\\vintext\\train/target.json",
+            "imgDir": r"D:\workspace\dataset\vintext\train\image",
+            "tarFile": r"D:\workspace\dataset\vintext\train\target.json",
             "prep": {
                 "DetAug": {
                     "onlyResize": False,

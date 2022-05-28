@@ -1,4 +1,4 @@
-se_eb3 = {
+syn_se_eb3 = {
     "totalEpoch": 1000,
     "startEpoch": 1,
     "lr": 0.003,

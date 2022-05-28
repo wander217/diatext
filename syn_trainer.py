@@ -102,45 +102,19 @@ class DetTrainer:
                     'probLoss': self._probLoss.calc(),
                     'threshLoss': self._threshLoss.calc(),
                     'binaryLoss': self._binaryLoss.calc(),
-                }, {})
+                })
                 self._totalLoss.reset()
                 self._probLoss.reset()
                 self._threshLoss.reset()
                 self._binaryLoss.reset()
 
-    def _validStep(self) -> Dict:
-        self._model.eval()
-        totalLoss: DetAverager = DetAverager()
-        threshLoss: DetAverager = DetAverager()
-        probLoss: DetAverager = DetAverager()
-        binaryLoss: DetAverager = DetAverager()
-        with torch.no_grad():
-            for batch in self._valid:
-                batchSize: int = batch['img'].size(0)
-                pred, loss, metric = self._model(batch)
-                totalLoss.update(loss.mean().item() * batchSize, batchSize)
-                probLoss.update(metric['probLoss'].item() * batchSize, batchSize)
-                threshLoss.update(metric['threshLoss'].item() * batchSize, batchSize)
-                binaryLoss.update(metric['binaryLoss'].item() * batchSize, batchSize)
-        return {
-            'totalLoss': totalLoss.calc(),
-            'probLoss': probLoss.calc(),
-            'threshLoss': threshLoss.calc(),
-            'binaryLoss': binaryLoss.calc()
-        }
-
-    def _save(self, trainRS: Dict, validRS: Dict):
-        if validRS['totalLoss'] < self._loss:
-            self._loss = validRS['totalLoss']
-            self._checkpoint.saveModel(self._model, self._step)
+    def _save(self, trainRS: Dict):
         self._checkpoint.saveCheckpoint(self._step, self._model, self._optim)
         self._logger.reportTime("Step {}:".format(self._step))
         self._logger.reportMetric(" - Training", trainRS)
-        self._logger.reportMetric(" - Validation", validRS)
         self._logger.reportMetric(" - Min_loss", {"total_loss": self._loss})
         self._logger.writeFile({
-            'training': trainRS,
-            'validation': validRS
+            'training': trainRS
         })
 
 

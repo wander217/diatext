@@ -10,16 +10,14 @@ from measure.metric import DetScore
 from typing import Dict, List, Tuple, OrderedDict
 import numpy as np
 import cv2 as cv
-import math
+from config import se_eb3
 
 
 class DBPredictor:
-    def __init__(self, config: str, pretrained):
+    def __init__(self, config: Dict, pretrained):
         self.device = torch.device("cpu")
         if torch.cuda.is_available():
             self.device = torch.device("cuda")
-        with open(config) as f:
-            config: Dict = yaml.safe_load(f)
         self._model = LossModel(**config['lossModel'], device=self.device)
         # print(sum(p.numel() for p in self.model.parameters() if p.requires_grad))
         state_dict = torch.load(pretrained, map_location=self.device)
@@ -65,34 +63,33 @@ class DBPredictor:
 
 
 if __name__ == "__main__":
-    configPath: str = r'config/dbpp_se_eb3.yaml'
-    pretrainedPath: str = r'D:\workspace\project\diatext\last (1).pth'
-    predictor = DBPredictor(configPath, pretrainedPath)
-    root: str = r'D:\workspace\dataset\vintext\test\image'
+    pretrainedPath: str = r'D:\workspace\project\diatext\checkpoint_27450.pth'
+    predictor = DBPredictor(se_eb3, pretrainedPath)
+    root: str = r'D:\icdar15\valid'
     count = 0
     precision, recall, f1score = 0, 0, 0
     for subRoot, dirs, files in os.walk(root):
         for file in files:
-            if file.endswith(".npy"):
-                img = np.load(os.path.join(subRoot, file))
+            if file.endswith(".jpg"):
+                img = cv.imread(os.path.join(subRoot, file))
                 boxes, scores = predictor(img)
                 # for item in boxes:
                 #     cv.polylines(img, [item.astype(np.int32)], True, (0, 255, 0))
                 # cv.imshow("abc", img)
                 # cv.waitKey(0)
-                with open(r"D:\workspace\dataset\vintext\test\target.json", encoding='utf-8') as f:
+                with open(r"D:\icdar15\valid\target.json", encoding='utf-8') as f:
                     data = json.loads(f.readline())
                 gt = {
                     "polygon": [[]],
                     "ignore": [[]]
                 }
                 for item in data:
-                    if item['img'] == file:
+                    if item['file_name'] == file:
                         for bbox in item['target']:
-                            gt['polygon'][0].append(bbox['polygon'])
+                            gt['polygon'][0].append(bbox['bbox'])
                             gt['ignore'][0].append(False)
                 det_acc = DetAcc(0.5, 0.5, 0.3)
-                det_acc(boxes[np.newaxis, :, :, :], scores[np.newaxis, :], gt)
+                det_acc(boxes[np.newaxis, :], scores[np.newaxis, :], gt)
                 result = det_acc.gather()
                 print(result)
                 result['file_name'] = "test{}.jpg".format(count)

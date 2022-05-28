@@ -30,13 +30,13 @@ class DBPredictor:
 
     def _resize(self, image: np.ndarray) -> Tuple:
         org_h, org_w, _ = image.shape
-        # scale = min([self._limit / org_h, self._limit / org_w])
-        # new_h = int(scale * org_h)
-        # new_w = int(scale * org_w)
+        scale = min([self._limit / org_h, self._limit / org_w])
+        new_h = int(scale * org_h)
+        new_w = int(scale * org_w)
         new_image = np.zeros((self._limit, self._limit, 3), dtype=np.uint8)
-        # image = cv.resize(image, (new_w, new_h), interpolation=cv.INTER_CUBIC)
-        new_image[:org_h, :org_w, :] = image
-        return new_image, org_h, org_w
+        image = cv.resize(image, (new_w, new_h), interpolation=cv.INTER_CUBIC)
+        new_image[:new_h, :new_w, :] = image
+        return new_image, new_h, new_w
 
     def _normalize(self, image: np.ndarray) -> np.ndarray:
         mean = [122.67891434, 116.66876762, 104.00698793]
@@ -56,39 +56,43 @@ class DBPredictor:
             pred: OrderedDict = self._model(dict(img=inputImage), training=False)
             bs, ss = self._score(pred, dict(img=inputImage))
 
-            # for i in range(len(bs[0])):
-            #     if ss[0][i] > 0:
-            #         bboxes.append(bs[0][i])
-            #         # bboxes.append(bs[0][i] * np.array([w / newW, h / newH]))
-            #         scores.append(ss[0][i])
-            return bs, ss
+            for i in range(len(bs[0])):
+                if ss[0][i] > 0:
+                    # bboxes.append(bs[0][i])
+                    bboxes.append(bs[0][i] * np.array([w / newW, h / newH]))
+                    scores.append(ss[0][i])
+            return np.array(bboxes), np.array(scores)
 
 
 if __name__ == "__main__":
-    configPath: str = r'config/dbpp_se_eb0.yaml'
-    pretrainedPath: str = r'D:\python_project\dbpp\pretrained\abc\checkpoint_602.pth'
+    configPath: str = r'config/dbpp_se_eb3.yaml'
+    pretrainedPath: str = r'D:\workspace\project\diatext\last (1).pth'
     predictor = DBPredictor(configPath, pretrainedPath)
-    root: str = r'D:\python_project\dbpp\breg_detection\test\image'
+    root: str = r'D:\workspace\dataset\vintext\test\image'
     count = 0
     precision, recall, f1score = 0, 0, 0
     for subRoot, dirs, files in os.walk(root):
         for file in files:
-            if file.endswith(".png") or file.endswith(".jpg"):
-                img = cv.imread(os.path.join(subRoot, file))
+            if file.endswith(".npy"):
+                img = np.load(os.path.join(subRoot, file))
                 boxes, scores = predictor(img)
-                with open(r"D:\python_project\dbpp\breg_detection\test\target.json", encoding='utf-8') as f:
+                # for item in boxes:
+                #     cv.polylines(img, [item.astype(np.int32)], True, (0, 255, 0))
+                # cv.imshow("abc", img)
+                # cv.waitKey(0)
+                with open(r"D:\workspace\dataset\vintext\test\target.json", encoding='utf-8') as f:
                     data = json.loads(f.readline())
                 gt = {
                     "polygon": [[]],
                     "ignore": [[]]
                 }
                 for item in data:
-                    if item['file_name'] == file:
+                    if item['img'] == file:
                         for bbox in item['target']:
-                            gt['polygon'][0].append(bbox['bbox'])
+                            gt['polygon'][0].append(bbox['polygon'])
                             gt['ignore'][0].append(False)
                 det_acc = DetAcc(0.5, 0.5, 0.3)
-                det_acc(boxes, scores, gt)
+                det_acc(boxes[np.newaxis, :, :, :], scores[np.newaxis, :], gt)
                 result = det_acc.gather()
                 print(result)
                 result['file_name'] = "test{}.jpg".format(count)

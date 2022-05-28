@@ -9,6 +9,7 @@ import argparse
 import warnings
 from loss_model import LossModel
 from measure import DetAcc, DetScore
+from config import se_eb0, se_eb1, se_eb2, se_eb3
 
 
 class DetTrainer:
@@ -148,15 +149,23 @@ class DetTrainer:
 if __name__ == "__main__":
     warnings.filterwarnings("ignore")
     parser = argparse.ArgumentParser(description="Training config")
-    parser.add_argument("-p", '--path', type=str, help="path of config file")
+    parser.add_argument("-t", '--type', type=str,
+                        choices=["se_eb0", "se_eb1", "se_eb2", "se_eb3"],
+                        help="type of backbone")
     parser.add_argument("-d", '--data', default='', type=str, help="path of data")
     parser.add_argument("-i", '--imgType', default=0, type=int, help="type of image")
     parser.add_argument("-s", '--save_interval', default=150, type=int, help="number of step to save")
     parser.add_argument("-b", '--start_epoch', default=1, type=int, help="start epoch")
     parser.add_argument("-r", '--resume', default='', type=str, help="resume path")
     args = parser.parse_args()
-    with open(args.path) as f:
-        config: Dict = yaml.safe_load(f)
+    if args.type == "se_eb0":
+        config = se_eb0
+    elif args.type == "se_eb1":
+        config = se_eb1
+    elif args.type == "se_eb2":
+        config = se_eb2
+    else:
+        config = se_eb3
     if args.data.strip():
         for item in ["train", "valid"]:
             config[item]['dataset']['imgDir'] = os.path.join(args.data.strip(), item, "image/")

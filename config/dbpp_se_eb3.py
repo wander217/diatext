@@ -55,9 +55,9 @@ se_eb3 = {
         "shuffle": True,
         "pinMemory": False,
         "dataset": {
-            "imgType": 1,
-            "imgDir": r"D:\workspace\dataset\vintext\train\image",
-            "tarFile": r"D:\workspace\dataset\vintext\train\target.json",
+            "imgType": 0,
+            "imgDir": r"D:\workspace\project\hiertext\data1\train\image",
+            "tarFile": r"D:\workspace\project\hiertext\data1\train\target.json",
             "prep": {
                 "DetAug": {
                     "onlyResize": False,

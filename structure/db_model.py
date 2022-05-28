@@ -7,6 +7,7 @@ from typing import List, Dict
 import torch
 import time
 import yaml
+from config import se_eb3
 
 
 class DBModel(nn.Module):
@@ -25,9 +26,7 @@ class DBModel(nn.Module):
 
 # test
 if __name__ == "__main__":
-    file_config: str = r'D:\db_pp\config\dbpp_se_eb3.yaml'
-    with open(file_config) as stream:
-        data = yaml.safe_load(stream)
+    data = se_eb3
     model = DBModel(**data['lossModel']['model'])
     total_params = sum(p.numel() for p in model.parameters())
     train_params = sum(p.numel() for p in model.parameters() if p.requires_grad)

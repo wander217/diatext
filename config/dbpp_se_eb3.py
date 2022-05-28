@@ -147,6 +147,9 @@ se_eb3 = {
                 },
                 "DetFilter": {
                     "key": [
+                        "polygon",
+                        "shape",
+                        "ignore",
                         "train"
                     ]
                 }

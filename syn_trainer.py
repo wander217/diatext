@@ -132,8 +132,8 @@ if __name__ == "__main__":
     config = syn_se_eb3
     if args.data.strip():
         for item in ["train", "valid"]:
-            config[item]['dataset']['imgDir'] = os.path.join(args.data.strip(), item, "image/")
-            config[item]['dataset']['tarFile'] = os.path.join(args.data.strip(), item, "target.json")
+            config[item]['dataset']['imgDir'] = os.path.join(args.data.strip(), "image/")
+            config[item]['dataset']['tarFile'] = os.path.join(args.data.strip(), "{}.json".format(item))
             config[item]['dataset']['imgType'] = args.imgType
     if args.resume.strip():
         config['checkpoint']['resume'] = args.resume.strip()

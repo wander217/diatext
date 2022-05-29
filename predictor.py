@@ -65,7 +65,7 @@ class DBPredictor:
 if __name__ == "__main__":
     pretrainedPath: str = r'D:\workspace\project\diatext\last.pth'
     predictor = DBPredictor(se_eb3, pretrainedPath)
-    root: str = r'D:\TextOCR\splited\valid\image'
+    root: str = r'D:\total_text\valid\image'
     count = 0
     precision, recall, f1score = 0, 0, 0
     for subRoot, dirs, files in os.walk(root):

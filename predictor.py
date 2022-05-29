@@ -65,7 +65,7 @@ class DBPredictor:
 if __name__ == "__main__":
     pretrainedPath: str = r'D:\workspace\project\diatext\last.pth'
     predictor = DBPredictor(se_eb3, pretrainedPath)
-    root: str = r'D:\workspace\dataset\idcard_graph\image'
+    root: str = r'C:\Users\Trinh_Thinh\Downloads\vietnamese_original\vietnamese\unseen_test_images'
     count = 0
     precision, recall, f1score = 0, 0, 0
     for subRoot, dirs, files in os.walk(root):

@@ -60,7 +60,7 @@ syn_se_eb3 = {
             "tarFile": r"D:\workspace\project\hiertext\data1\train\target.json",
             "prep": {
                 "DetAug": {
-                    "onlyResize": True,
+                    "onlyResize": False,
                     "Fliplr": {
                         "p": 0.5
                     },

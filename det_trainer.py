@@ -78,6 +78,7 @@ class DetTrainer:
             self._logger.reportDelimitter()
             self._logger.reportTime("Epoch {}".format(i))
             self._trainStep()
+            self._updateLR(i)
         self._logger.reportDelimitter()
         self._logger.reportTime("Finish")
         self._logger.reportDelimitter()

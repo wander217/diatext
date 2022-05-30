@@ -74,19 +74,19 @@ class DetAug:
         for tar in data['target']:
             if self._onlyResize:
                 newPolygon: List = [(point[0], point[1])
-                                    for point in tar['bbox']]
+                                    for point in tar['polygon']]
             else:
                 keyPoints: List = [Keypoint(point[0], point[1])
-                                   for point in tar['bbox']]
+                                   for point in tar['polygon']]
                 keyPoints = aug.augment_keypoints([
                     KeypointsOnImage(keyPoints, shape=shape)
                 ])[0].keypoints
                 newPolygon: List = [(keyPoint.x, keyPoint.y)
                                     for keyPoint in keyPoints]
             tars.append({
-                'label': tar['text'],
+                'label': tar['label'],
                 'polygon': newPolygon,
-                'ignore': tar['text'] == '###'
+                'ignore': tar['label'] == '###'
             })
         data['target'] = tars
         return data

@@ -68,9 +68,9 @@ se_eb3 = {
                         "rotate": (-20, 20),
                         "fit_output": True
                     },
-                    "Resize": {
-                        "size": (0.5, 3.0)
-                    }
+                    # "Resize": {
+                    #     "size": (0.5, 3.0)
+                    # }
                 },
                 "DetCrop": {
                     "crop": False,

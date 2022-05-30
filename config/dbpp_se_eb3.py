@@ -49,7 +49,7 @@ se_eb3 = {
         "accThresh": 0.5
     },
     "train": {
-        "batchSize": 4,
+        "batchSize": 8,
         "numWorkers": 4,
         "dropLast": True,
         "shuffle": True,

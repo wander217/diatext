@@ -60,7 +60,7 @@ se_eb3 = {
             "tarFile": r"D:\workspace\project\hiertext\data1\train\target.json",
             "prep": {
                 "DetAug": {
-                    "onlyResize": False,
+                    "onlyResize": True,
                     "Fliplr": {
                         "p": 0.5
                     },
@@ -73,7 +73,7 @@ se_eb3 = {
                     }
                 },
                 "DetCrop": {
-                    "crop": True,
+                    "crop": False,
                     "minCropSize": 0.1,
                     "maxTries": 10,
                     "generalSize": (640, 640)

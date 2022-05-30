@@ -49,15 +49,14 @@ class DetTrainer:
         self._curLR: float = lr
         self._step = 0
         self._loss = 1000.0
-        self._total_step = 200000
         self._save_interval = save_interval
         self._totalLoss: DetAverager = DetAverager()
         self._probLoss: DetAverager = DetAverager()
         self._threshLoss: DetAverager = DetAverager()
         self._binaryLoss: DetAverager = DetAverager()
 
-    def _updateLR(self):
-        rate: float = (1. - self._step / self._total_step) ** self._factor
+    def _updateLR(self, epoch):
+        rate: float = (1. - epoch / self._totalEpoch) ** self._factor
         self._curLR: float = max([rate * self._lr, 0.001])
         for groups in self._optim.param_groups:
             groups['lr'] = self._curLR
@@ -79,8 +78,7 @@ class DetTrainer:
             self._logger.reportDelimitter()
             self._logger.reportTime("Epoch {}".format(i))
             self._trainStep()
-            if self._step > self._total_step:
-                break
+            self._updateLR(i)
         self._logger.reportDelimitter()
         self._logger.reportTime("Finish")
         self._logger.reportDelimitter()
@@ -99,7 +97,6 @@ class DetTrainer:
             self._threshLoss.update(metric['threshLoss'].item() * batchSize, batchSize)
             self._binaryLoss.update(metric['binaryLoss'].item() * batchSize, batchSize)
             self._step += 1
-            self._updateLR()
             if self._step % self._save_interval == 0:
                 validRS = self._validStep()
                 self._model.train()

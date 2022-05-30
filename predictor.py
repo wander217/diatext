@@ -64,7 +64,7 @@ class DBPredictor:
 
 
 if __name__ == "__main__":
-    pretrainedPath: str = r'D:\python_project\diatext\last (1).pth'
+    pretrainedPath: str = r'D:\python_project\diatext\pretrained.pth'
     predictor = DBPredictor(se_eb3, pretrainedPath)
     root: str = r'D:\python_project\dbpp\breg_detection\test\image'
     count = 0

@@ -73,7 +73,7 @@ se_eb3 = {
                     # }
                 },
                 "DetCrop": {
-                    "crop": False,
+                    "crop": True,
                     "minCropSize": 0.1,
                     "maxTries": 10,
                     "generalSize": (640, 640)

@@ -49,6 +49,7 @@ class DetTrainer:
         self._curLR: float = lr
         self._step = 0
         self._loss = 1000.0
+        self._total_step = 200000
         self._save_interval = save_interval
         self._totalLoss: DetAverager = DetAverager()
         self._probLoss: DetAverager = DetAverager()
@@ -56,7 +57,7 @@ class DetTrainer:
         self._binaryLoss: DetAverager = DetAverager()
 
     def _updateLR(self):
-        rate: float = (1. - self._step / 100000) ** self._factor
+        rate: float = (1. - self._step / self._total_step) ** self._factor
         self._curLR: float = rate * self._lr
         for groups in self._optim.param_groups:
             groups['lr'] = self._curLR
@@ -78,7 +79,7 @@ class DetTrainer:
             self._logger.reportDelimitter()
             self._logger.reportTime("Epoch {}".format(i))
             self._trainStep()
-            if self._step > 100000:
+            if self._step > self._total_step:
                 break
         self._logger.reportDelimitter()
         self._logger.reportTime("Finish")

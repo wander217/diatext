@@ -58,7 +58,7 @@ class DetTrainer:
 
     def _updateLR(self):
         rate: float = (1. - self._step / self._total_step) ** self._factor
-        self._curLR: float = rate * self._lr
+        self._curLR: float = max([rate * self._lr, 0.001])
         for groups in self._optim.param_groups:
             groups['lr'] = self._curLR
 

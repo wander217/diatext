@@ -1,7 +1,8 @@
 import torch.nn as nn
 from measure import DBLoss
 from structure import DBModel
-from typing import Dict, OrderedDict, Tuple
+from typing import Dict, Tuple
+from collections import OrderedDict
 
 
 class LossModel(nn.Module):

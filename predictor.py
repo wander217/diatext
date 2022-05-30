@@ -7,7 +7,8 @@ import yaml
 
 from measure import DetAcc
 from measure.metric import DetScore
-from typing import Dict, List, Tuple, OrderedDict
+from typing import Dict, List, Tuple
+from collections import OrderedDict
 import numpy as np
 import cv2 as cv
 from config import se_eb3
@@ -63,14 +64,14 @@ class DBPredictor:
 
 
 if __name__ == "__main__":
-    pretrainedPath: str = r'D:\workspace\project\diatext\last.pth'
+    pretrainedPath: str = r'D:\python_project\diatext\last (1).pth'
     predictor = DBPredictor(se_eb3, pretrainedPath)
-    root: str = r'C:\Users\Trinh_Thinh\Downloads\vietnamese_original\vietnamese\unseen_test_images'
+    root: str = r'D:\python_project\dbpp\breg_detection\test\image'
     count = 0
     precision, recall, f1score = 0, 0, 0
     for subRoot, dirs, files in os.walk(root):
         for file in files:
-            if file.endswith(".jpg"):
+            if file.endswith(".jpg") or file.endswith(".png"):
                 img = cv.imread(os.path.join(subRoot, file))
                 boxes, scores = predictor(img)
                 for item in boxes:

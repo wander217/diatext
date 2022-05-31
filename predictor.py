@@ -64,9 +64,9 @@ class DBPredictor:
 
 
 if __name__ == "__main__":
-    pretrainedPath: str = r'D:\python_project\diatext\checkpoint_20700.pth'
+    pretrainedPath: str = r'D:\python_project\diatext\checkpoint_12900.pth'
     predictor = DBPredictor(se_eb3, pretrainedPath)
-    root: str = r'C:\Users\thinhtq\Downloads\vietnamese_original\vietnamese\unseen_test_images'
+    root: str = r'D:\python_project\dbpp\breg_detection\valid\image'
     count = 0
     precision, recall, f1score = 0, 0, 0
     for subRoot, dirs, files in os.walk(root):

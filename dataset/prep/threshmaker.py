@@ -2,7 +2,8 @@ import numpy as np
 import pyclipper
 from shapely.geometry import Polygon
 import cv2 as cv
-from typing import List, OrderedDict
+from typing import List
+from collections import OrderedDict
 
 
 class ThreshMaker:

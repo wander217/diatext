@@ -17,10 +17,10 @@ class DBModel(nn.Module):
         self._neck = DBNeck(**neck)
         self._head = DBHead(**head)
 
-    def forward(self, x: Tensor) -> OrderedDict:
+    def forward(self, x: Tensor, training: bool = True) -> OrderedDict:
         brs: List = self._backbone(x)
         nrs: Tensor = self._neck(brs)
-        hrs: OrderedDict = self._head(nrs)
+        hrs: OrderedDict = self._head(nrs, training=training)
         return hrs
 
 

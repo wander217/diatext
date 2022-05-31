@@ -25,7 +25,7 @@ class DBPredictor:
         self._model.load_state_dict(state_dict['model'])
         # multi scale problem => training
         self._score: DetScore = DetScore(**config['score'])
-        self._limit: int = 960
+        self._limit: int = 1024
 
     def _resize(self, image: np.ndarray) -> Tuple:
         org_h, org_w, _ = image.shape
@@ -64,40 +64,47 @@ class DBPredictor:
 
 
 if __name__ == "__main__":
-    pretrainedPath: str = r'D:\python_project\diatext\last.pth'
+    pretrainedPath: str = r'D:\python_project\diatext\breg_rp\checkpoint_13244.pth'
     predictor = DBPredictor(se_eb3, pretrainedPath)
-    root: str = r'D:\python_project\diatext\vintext\test\image'
+    root: str = r'C:\Users\thinhtq\Downloads\pdftoimage'
     count = 0
+    c = 0
     precision, recall, f1score = 0, 0, 0
+    # for i, item in enumerate(os.listdir(root)):
+    #     os.rename(os.path.join(root, item), os.path.join(root, 'folder{}'.format(i)))
     for subRoot, dirs, files in os.walk(root):
         for file in files:
-            if file.endswith(".npy"):
-                img = np.load(os.path.join(subRoot, file))
+            if file.endswith(".jpg") or file.endswith(".png"):
+                new_file = os.path.join(subRoot, 'img{}.jpg'.format(c))
+                os.rename(os.path.join(subRoot, file), new_file)
+                c += 1
+                img = cv.imread(os.path.join(subRoot, new_file))
                 boxes, scores = predictor(img)
-                # for item in boxes:
-                #     cv.polylines(img, [item.astype(np.int32)], True, (0, 255, 0))
+                for item in boxes:
+                    cv.polylines(img, [item.astype(np.int32)], True, (0, 0, 255))
                 # cv.imshow("abc", img)
                 # cv.waitKey(0)
-                with open(r"D:\python_project\diatext\vintext\test\target.json", encoding='utf-8') as f:
-                    data = json.loads(f.readline())
-                gt = {
-                    "polygon": [[]],
-                    "ignore": [[]]
-                }
-                for item in data:
-                    if item['img'] == file:
-                        for bbox in item['target']:
-                            gt['polygon'][0].append(bbox['polygon'])
-                            gt['ignore'][0].append(False)
-                det_acc = DetAcc(0.5, 0.5, 0.3)
-                det_acc(boxes[np.newaxis, :], scores[np.newaxis, :], gt)
-                result = det_acc.gather()
-                print(result)
-                result['file_name'] = "test{}.jpg".format(count)
-                recall += result['recall']
-                precision += result['precision']
-                f1score += result['f1score']
-                count += 1
-    print("recall: {}, precision: {}, f1score: {}".format(recall / count,
-                                                          precision / count,
-                                                          f1score / count))
+                cv.imwrite(os.path.join("result2", file), img)
+    #             with open(r"D:\python_project\dbpp\breg_detection\test\target.json", encoding='utf-8') as f:
+    #                 data = json.loads(f.readline())
+    #             gt = {
+    #                 "polygon": [[]],
+    #                 "ignore": [[]]
+    #             }
+    #             for item in data:
+    #                 if item['file_name'] == file:
+    #                     for bbox in item['target']:
+    #                         gt['polygon'][0].append(bbox['bbox'])
+    #                         gt['ignore'][0].append(False)
+    #             det_acc = DetAcc(0.5, 0.5, 0.3)
+    #             det_acc(boxes[np.newaxis, :], scores[np.newaxis, :], gt)
+    #             result = det_acc.gather()
+    #             print(result)
+    #             result['file_name'] = "test{}.jpg".format(count)
+    #             recall += result['recall']
+    #             precision += result['precision']
+    #             f1score += result['f1score']
+    #             count += 1
+    # print("recall: {}, precision: {}, f1score: {}".format(recall / count,
+    #                                                       precision / count,
+    #                                                       f1score / count))

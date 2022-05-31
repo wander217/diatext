@@ -56,8 +56,8 @@ se_eb3 = {
         "pinMemory": False,
         "dataset": {
             "imgType": 0,
-            "imgDir": r"D:\workspace\project\hiertext\data1\train\image",
-            "tarFile": r"D:\workspace\project\hiertext\data1\train\target.json",
+            "imgDir": r"D:\python_project\dbpp\breg_detection\train\image",
+            "tarFile": r"D:\python_project\dbpp\breg_detection\train\target.json",
             "prep": {
                 "DetAug": {
                     "onlyResize": False,

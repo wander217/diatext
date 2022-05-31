@@ -1,4 +1,5 @@
-from typing import List, OrderedDict
+from typing import List
+from collections import OrderedDict
 
 
 class DetFilter:

@@ -41,7 +41,7 @@ syn_se_eb3 = {
         "edgeThresh": 5,
         "probThresh": 0.3,
         "scoreThresh": 0.7,
-        "label": "binaryMap"
+        "label": "probMap"
     },
     "accurancy": {
         "ignoreThresh": 0.5,

@@ -64,40 +64,40 @@ class DBPredictor:
 
 
 if __name__ == "__main__":
-    pretrainedPath: str = r'D:\python_project\diatext\checkpoint_12900.pth'
+    pretrainedPath: str = r'D:\python_project\diatext\last.pth'
     predictor = DBPredictor(se_eb3, pretrainedPath)
-    root: str = r'D:\python_project\dbpp\breg_detection\valid\image'
+    root: str = r'D:\python_project\diatext\vintext\test\image'
     count = 0
     precision, recall, f1score = 0, 0, 0
     for subRoot, dirs, files in os.walk(root):
         for file in files:
-            if file.endswith(".jpg") or file.endswith(".png"):
-                img = cv.imread(os.path.join(subRoot, file))
+            if file.endswith(".npy"):
+                img = np.load(os.path.join(subRoot, file))
                 boxes, scores = predictor(img)
-                for item in boxes:
-                    cv.polylines(img, [item.astype(np.int32)], True, (0, 255, 0))
-                cv.imshow("abc", img)
-                cv.waitKey(0)
-    #             with open(r"D:\icdar15\valid\target.json", encoding='utf-8') as f:
-    #                 data = json.loads(f.readline())
-    #             gt = {
-    #                 "polygon": [[]],
-    #                 "ignore": [[]]
-    #             }
-    #             for item in data:
-    #                 if item['file_name'] == file:
-    #                     for bbox in item['target']:
-    #                         gt['polygon'][0].append(bbox['bbox'])
-    #                         gt['ignore'][0].append(False)
-    #             det_acc = DetAcc(0.5, 0.5, 0.3)
-    #             det_acc(boxes[np.newaxis, :], scores[np.newaxis, :], gt)
-    #             result = det_acc.gather()
-    #             print(result)
-    #             result['file_name'] = "test{}.jpg".format(count)
-    #             recall += result['recall']
-    #             precision += result['precision']
-    #             f1score += result['f1score']
-    #             count += 1
-    # print("recall: {}, precision: {}, f1score: {}".format(recall / count,
-    #                                                       precision / count,
-    #                                                       f1score / count))
+                # for item in boxes:
+                #     cv.polylines(img, [item.astype(np.int32)], True, (0, 255, 0))
+                # cv.imshow("abc", img)
+                # cv.waitKey(0)
+                with open(r"D:\python_project\diatext\vintext\test\target.json", encoding='utf-8') as f:
+                    data = json.loads(f.readline())
+                gt = {
+                    "polygon": [[]],
+                    "ignore": [[]]
+                }
+                for item in data:
+                    if item['img'] == file:
+                        for bbox in item['target']:
+                            gt['polygon'][0].append(bbox['polygon'])
+                            gt['ignore'][0].append(False)
+                det_acc = DetAcc(0.5, 0.5, 0.3)
+                det_acc(boxes[np.newaxis, :], scores[np.newaxis, :], gt)
+                result = det_acc.gather()
+                print(result)
+                result['file_name'] = "test{}.jpg".format(count)
+                recall += result['recall']
+                precision += result['precision']
+                f1score += result['f1score']
+                count += 1
+    print("recall: {}, precision: {}, f1score: {}".format(recall / count,
+                                                          precision / count,
+                                                          f1score / count))

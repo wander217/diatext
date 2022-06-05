@@ -64,16 +64,18 @@ class DBPredictor:
 
 
 if __name__ == "__main__":
-    pretrainedPath: str = r'D:\python_project\diatext\checkpoint_20700.pth'
+    pretrainedPath: str = r'D:\workspace\project\diatext\text_detection_eb3.pth'
     predictor = DBPredictor(se_eb3, pretrainedPath)
-    root: str = r'C:\Users\thinhtq\Downloads\vietnamese_original\vietnamese\unseen_test_images'
+    root: str = r'C:\Users\Trinh_Thinh\Downloads\valid\test\image'
     count = 0
     precision, recall, f1score = 0, 0, 0
     for subRoot, dirs, files in os.walk(root):
         for file in files:
-            if file.endswith(".jpg") or file.endswith(".png"):
+            if file.endswith(".jpg"):
                 img = cv.imread(os.path.join(subRoot, file))
+                start = time.time()
                 boxes, scores = predictor(img)
+                print(time.time()-start)
                 for item in boxes:
                     cv.polylines(img, [item.astype(np.int32)], True, (0, 255, 0))
                 cv.imshow("abc", img)

@@ -44,10 +44,9 @@ class DBPredictor:
         image = torch.from_numpy(image).permute(2, 0, 1).float()
         return image.unsqueeze(0)
 
-    def __call__(self, image: np.ndarray) -> Tuple:
+    def __call__(self, image: np.ndarray) -> List:
         self._model.eval()
-        bboxes: List = []
-        scores: List = []
+        result = []
         with torch.no_grad():
             h, w, _ = image.shape
             reImage, newH, newW = self._resize(image)
@@ -57,10 +56,11 @@ class DBPredictor:
 
             for i in range(len(bs[0])):
                 if ss[0][i] > 0:
-                    # bboxes.append(bs[0][i])
-                    bboxes.append(bs[0][i] * np.array([w / newW, h / newH]))
-                    scores.append(ss[0][i])
-            return np.array(bboxes), np.array(scores)
+                    result.append({
+                        "bbox": (bs[0][i] * np.array([w / newW, h / newH])).tolist(),
+                        "bbox_score": ss[0][i]
+                    })
+            return result
 
 
 if __name__ == "__main__":
@@ -74,10 +74,10 @@ if __name__ == "__main__":
             if file.endswith(".png") or file.endswith(".jpg"):
                 img = cv.imread(os.path.join(subRoot, file))
                 start = time.time()
-                boxes, scores = predictor(img)
+                result = predictor(img)
                 print(time.time()-start)
-                for item in boxes:
-                    cv.polylines(img, [item.astype(np.int32)], True, (0, 255, 0))
+                for item in result:
+                    cv.polylines(img, [np.array(item['bbox']).astype(np.int32)], True, (0, 255, 0))
                 cv.imshow("abc", img)
                 cv.waitKey(0)
     #             with open(r"D:\icdar15\valid\target.json", encoding='utf-8') as f:

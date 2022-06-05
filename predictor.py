@@ -64,22 +64,22 @@ class DBPredictor:
 
 
 if __name__ == "__main__":
-    pretrainedPath: str = r'../input/pretrained-det/text_detection_eb3.pth'
+    pretrainedPath: str = r'D:\workspace\project\diatext\text_detection_eb3.pth'
     predictor = DBPredictor(se_eb3, pretrainedPath)
-    root: str = r'../input/abcdedf'
+    root: str = r'C:\Users\Trinh_Thinh\Downloads\valid\test\image'
     count = 0
     precision, recall, f1score = 0, 0, 0
     for subRoot, dirs, files in os.walk(root):
         for file in files:
-            if file.endswith(".png"):
+            if file.endswith(".png") or file.endswith(".jpg"):
                 img = cv.imread(os.path.join(subRoot, file))
                 start = time.time()
                 boxes, scores = predictor(img)
                 print(time.time()-start)
-                # for item in boxes:
-                #     cv.polylines(img, [item.astype(np.int32)], True, (0, 255, 0))
-                # cv.imshow("abc", img)
-                # cv.waitKey(0)
+                for item in boxes:
+                    cv.polylines(img, [item.astype(np.int32)], True, (0, 255, 0))
+                cv.imshow("abc", img)
+                cv.waitKey(0)
     #             with open(r"D:\icdar15\valid\target.json", encoding='utf-8') as f:
     #                 data = json.loads(f.readline())
     #             gt = {

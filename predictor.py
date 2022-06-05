@@ -64,9 +64,9 @@ class DBPredictor:
 
 
 if __name__ == "__main__":
-    pretrainedPath: str = r'D:\workspace\project\diatext\text_detection_eb3.pth'
+    pretrainedPath: str = r'../input/pretrained-det/text_detection_eb3.pth'
     predictor = DBPredictor(se_eb3, pretrainedPath)
-    root: str = r'C:\Users\Trinh_Thinh\Downloads\valid\test\image'
+    root: str = r'../input/abcdedf'
     count = 0
     precision, recall, f1score = 0, 0, 0
     for subRoot, dirs, files in os.walk(root):

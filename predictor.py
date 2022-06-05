@@ -71,7 +71,7 @@ if __name__ == "__main__":
     precision, recall, f1score = 0, 0, 0
     for subRoot, dirs, files in os.walk(root):
         for file in files:
-            if file.endswith(".jpg"):
+            if file.endswith(".png"):
                 img = cv.imread(os.path.join(subRoot, file))
                 start = time.time()
                 boxes, scores = predictor(img)

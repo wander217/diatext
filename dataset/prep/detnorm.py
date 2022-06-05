@@ -1,5 +1,6 @@
 import numpy as np
-from typing import List, OrderedDict
+from typing import List
+from collections import OrderedDict
 
 
 class DetNorm:

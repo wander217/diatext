@@ -2,7 +2,7 @@ import numpy as np
 import cv2 as cv
 from shapely.geometry import Polygon
 import pyclipper
-from typing import List, OrderedDict
+from typing import List
 from collections import OrderedDict
 
 

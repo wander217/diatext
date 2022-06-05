@@ -76,10 +76,10 @@ if __name__ == "__main__":
                 start = time.time()
                 boxes, scores = predictor(img)
                 print(time.time()-start)
-                for item in boxes:
-                    cv.polylines(img, [item.astype(np.int32)], True, (0, 255, 0))
-                cv.imshow("abc", img)
-                cv.waitKey(0)
+                # for item in boxes:
+                #     cv.polylines(img, [item.astype(np.int32)], True, (0, 255, 0))
+                # cv.imshow("abc", img)
+                # cv.waitKey(0)
     #             with open(r"D:\icdar15\valid\target.json", encoding='utf-8') as f:
     #                 data = json.loads(f.readline())
     #             gt = {

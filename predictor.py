@@ -76,7 +76,7 @@ if __name__ == "__main__":
         for file in files:
             if file.endswith(".jpg") or file.endswith(".png"):
                 new_file = os.path.join(subRoot, 'img{}.jpg'.format(c))
-                os.rename(os.path.join(subRoot, file), new_file)
+                # os.rename(os.path.join(subRoot, file), new_file)
                 c += 1
                 img = cv.imread(os.path.join(subRoot, new_file))
                 boxes, scores = predictor(img)
@@ -84,7 +84,7 @@ if __name__ == "__main__":
                     cv.polylines(img, [item.astype(np.int32)], True, (0, 0, 255))
                 # cv.imshow("abc", img)
                 # cv.waitKey(0)
-                cv.imwrite(os.path.join("result2", file), img)
+                cv.imwrite(os.path.join("result3", file), img)
     #             with open(r"D:\python_project\dbpp\breg_detection\test\target.json", encoding='utf-8') as f:
     #                 data = json.loads(f.readline())
     #             gt = {

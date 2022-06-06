@@ -114,7 +114,7 @@ class DetScore:
         cv.fillPoly(mask, [copiedBox.reshape((-1, 2)).astype(np.int32)], 1)
         return cv.mean(probMap[yMin:yMax + 1, xMin:xMax + 1], mask=mask)[0]
 
-    def _expand(self, bbox: np.ndarray, ratio: float = 1.5) -> np.ndarray:
+    def _expand(self, bbox: np.ndarray, ratio: float = 4) -> np.ndarray:
         '''
         expanding bounding box by ratio
             :param bbox: bounding box point
